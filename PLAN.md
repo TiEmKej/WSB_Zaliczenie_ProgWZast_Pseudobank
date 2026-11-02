@@ -11,6 +11,25 @@ Zasady:
 - jeden użytkownik to jedno konto bankowe, więc numer konta i saldo są w tabeli `users`,
 - po każdym kroku sprawdzam działanie w przeglądarce, uruchamiam testy i robię commit.
 
+## Postęp
+
+| Krok | Stan |
+| --- | --- |
+| 1. Uruchomienie projektu | zrobiony |
+| 2. Baza danych i role | zrobiony |
+| 3. Rejestracja, logowanie, wylogowanie | zrobiony, 12 testów przechodzi |
+| 4. Uprawnienia i strony zależne od roli | następny |
+| 5–11 | do zrobienia |
+
+Zmiany względem planu:
+
+- doinstalowany `laravel/tinker` do sprawdzania danych w bazie,
+- Faker nie jest zainstalowany, więc `createUser()` w `tests/TestCase.php` używa `uniqid()` do e-maila,
+- layout leży w `resources/views/layouts/app.blade.php`,
+- konta z seedera: `admin@example.com`, `piekarskim@example.com`, `uczelnis@example.com`, hasło `Haslo123`.
+
+Do kroku 4: `/` ma przekierowywać do `dashboard` albo `login`, więc `HomeTest` trzeba przerobić, a `/admin/users` na razie jest tymczasową trasą do czasu kroku 5.
+
 ## Testy
 
 Testy PHPUnit są w `tests/Feature` i uruchamia je `./vendor/bin/sail test`. Korzystają z osobnej bazy `testing` w MariaDB, więc nie naruszają danych aplikacji.
@@ -82,9 +101,9 @@ Nowa migracja `create_transfers_table`:
 
 Do zrobienia:
 
-- [ ] model `Transfer` z relacjami `sender()` i `recipient()`,
-- [ ] w `User`: metoda `isAdmin()`, cast `'balance' => 'decimal:2'`, generowanie unikalnego numeru konta,
-- [ ] `DatabaseSeeder`: administrator i dwóch klientów z ustawionym `email_verified_at`.
+- [x] model `Transfer` z relacjami `sender()` i `recipient()`,
+- [x] w `User`: metoda `isAdmin()`, cast `'balance' => 'decimal:2'`, generowanie unikalnego numeru konta,
+- [x] `DatabaseSeeder`: administrator i dwóch klientów z ustawionym `email_verified_at`.
 
 `role`, `account_number` i `balance` nie trafiają do `#[Fillable]`. Ustawiam je przez `forceFill()`, żeby nikt nie nadał sobie roli ani salda, dopisując pole do formularza.
 
@@ -108,11 +127,11 @@ Trasa musi nazywać się `login`, bo tam Laravel przekierowuje niezalogowanych.
 
 Do zrobienia:
 
-- [ ] walidacja rejestracji: `required`, `email`, `unique:users`, `confirmed`, minimalna długość hasła,
-- [ ] polskie komunikaty jako drugi argument `$request->validate()`,
-- [ ] logowanie przez `Auth::attempt()`, potem `$request->session()->regenerate()`,
-- [ ] wylogowanie: `Auth::logout()`, `session()->invalidate()`, `session()->regenerateToken()`,
-- [ ] `@csrf` w każdym formularzu i `old('pole')` przy błędach.
+- [x] walidacja rejestracji: `required`, `email`, `unique:users`, `confirmed`, minimalna długość hasła,
+- [x] polskie komunikaty jako drugi argument `$request->validate()`,
+- [x] logowanie przez `Auth::attempt()`, potem `$request->session()->regenerate()`,
+- [x] wylogowanie: `Auth::logout()`, `session()->invalidate()`, `session()->regenerateToken()`,
+- [x] `@csrf` w każdym formularzu i `old('pole')` przy błędach.
 
 Hasło szyfruje cast `'password' => 'hashed'` w modelu `User`, więc nie wywołuję dodatkowo `Hash::make()`.
 
@@ -120,11 +139,11 @@ Sprawdzam: w bazie hasło jest hashem `$2y$...`, a złe hasło daje komunikat b�
 
 Testy `AuthTest`:
 
-- [ ] poprawna rejestracja tworzy użytkownika z zahashowanym hasłem i rolą `user`,
-- [ ] puste pola i zajęty e-mail dają błędy walidacji,
-- [ ] dopisanie `role=admin` do formularza nie nadaje uprawnień,
-- [ ] logowanie poprawnym hasłem działa, a złym nie,
-- [ ] wylogowanie kończy sesję.
+- [x] poprawna rejestracja tworzy użytkownika z zahashowanym hasłem i rolą `user`,
+- [x] puste pola i zajęty e-mail dają błędy walidacji,
+- [x] dopisanie `role=admin` do formularza nie nadaje uprawnień,
+- [x] logowanie poprawnym hasłem działa, a złym nie,
+- [x] wylogowanie kończy sesję.
 
 Commit: `Rejestracja i logowanie`
 
