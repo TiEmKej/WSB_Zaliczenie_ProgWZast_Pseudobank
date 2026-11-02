@@ -4,7 +4,8 @@
     "type": "project",
     "require": {
         "php": "^8.3",
-        "laravel/framework": "^13.17"
+        "laravel/framework": "^13.17",
+        "laravel/tinker": "^3.0"
     },
     "require-dev": {
         "laravel/sail": "^1.69",
