@@ -2,14 +2,26 @@
 
 Aplikacja bankowa na zaliczenie przedmiotu Programowanie w zastosowaniach.
 
-Stos: Laravel 13, widoki Blade, zwykły CSS, MariaDB i Mailpit w kontenerach Sail.
+Stos: Laravel 13, widoki Blade, Tailwind CSS przez Vite, MariaDB i Mailpit w kontenerach Sail.
 Bez gotowych pakietów logowania (Breeze, Jetstream), bo logowanie jest częścią oceny i trzeba umieć je wyjaśnić.
 
 Zasady:
 
 - walidacja w kontrolerach przez `$request->validate()`, bez dodatkowych warstw,
 - jeden użytkownik to jedno konto bankowe, więc numer konta i saldo są w tabeli `users`,
-- po każdym kroku sprawdzam działanie w przeglądarce i robię commit.
+- po każdym kroku sprawdzam działanie w przeglądarce, uruchamiam testy i robię commit.
+
+## Testy
+
+Testy PHPUnit są w `tests/Feature` i uruchamia je `./vendor/bin/sail test`. Korzystają z osobnej bazy `testing` w MariaDB, więc nie naruszają danych aplikacji.
+
+Zasady pisania testów:
+
+- `use RefreshDatabase;` w każdej klasie testów korzystającej z bazy,
+- `$this->withoutVite();` w `setUp()`, jeśli test wyświetla stronę, żeby nie wymagał zbudowanego frontendu,
+- `$this->actingAs($user)` zamiast logowania w każdym teście,
+- metoda pomocnicza `createUser(string $role = 'user')` w `tests/TestCase.php`, która tworzy użytkownika przez `forceFill()`,
+- `Notification::fake()` przy mailach aktywacyjnych.
 
 ## Wymagania i kroki, które je realizują
 
@@ -33,9 +45,13 @@ Zasady:
 ```bash
 ./vendor/bin/sail up -d
 ./vendor/bin/sail artisan migrate:fresh
+./vendor/bin/sail npm install
+./vendor/bin/sail npm run dev
 ```
 
 `migrate:fresh` jest potrzebne, bo baza w kontenerze ma jeszcze tabele usunięte podczas czyszczenia projektu.
+
+`npm run dev` zostawiam włączone w osobnym terminalu podczas pracy, bo odświeża style na bieżąco. Bez niego albo bez wcześniejszego `npm run build` strona kończy się błędem o braku pliku manifestu Vite.
 
 Sprawdzam:
 
@@ -76,7 +92,7 @@ Commit: `Tabele użytkowników i przelewów`
 
 ## Krok 3. Rejestracja, logowanie, wylogowanie
 
-Plik `resources/views/layouts/app.blade.php` z menu, komunikatami i błędami walidacji oraz `public/css/app.css` dołączony przez `asset()`.
+Plik `resources/views/layouts/app.blade.php` z menu, komunikatami i błędami walidacji. Style dołącza `@vite(['resources/css/app.css', 'resources/js/app.js'])`, a wygląd powstaje z klas Tailwinda.
 
 `AuthController`:
 
@@ -102,6 +118,14 @@ Hasło szyfruje cast `'password' => 'hashed'` w modelu `User`, więc nie wywołu
 
 Sprawdzam: w bazie hasło jest hashem `$2y$...`, a złe hasło daje komunikat błędu.
 
+Testy `AuthTest`:
+
+- [ ] poprawna rejestracja tworzy użytkownika z zahashowanym hasłem i rolą `user`,
+- [ ] puste pola i zajęty e-mail dają błędy walidacji,
+- [ ] dopisanie `role=admin` do formularza nie nadaje uprawnień,
+- [ ] logowanie poprawnym hasłem działa, a złym nie,
+- [ ] wylogowanie kończy sesję.
+
 Commit: `Rejestracja i logowanie`
 
 ## Krok 4. Uprawnienia i strony zależne od roli
@@ -112,6 +136,12 @@ Commit: `Rejestracja i logowanie`
 - [ ] `/` przekierowuje do `dashboard` albo `login`.
 
 Sprawdzam: klient wchodzący na `/admin/users` dostaje 403, a niezalogowany trafia na logowanie.
+
+Testy `RoleAccessTest`:
+
+- [ ] klient na `/admin/users` dostaje 403, a administrator 200,
+- [ ] niezalogowany jest przekierowany na `/login`,
+- [ ] `/dashboard` pokazuje klientowi saldo, a administratora przekierowuje do panelu.
 
 Commit: `Role i strona klienta z saldem`
 
@@ -138,6 +168,13 @@ Reguły:
 - [ ] administrator nie może usunąć swojego konta ani odebrać sobie roli,
 - [ ] nie można usunąć klienta z saldem większym od zera,
 - [ ] saldo nie jest edytowalne, zmieniają je tylko przelewy.
+
+Testy `AdminUserTest`:
+
+- [ ] lista i podgląd działają, dodawanie, edycja i usuwanie zmieniają bazę,
+- [ ] edycja z pustym hasłem nie zmienia hasła,
+- [ ] administrator nie może usunąć siebie ani odebrać sobie roli,
+- [ ] nie można usunąć klienta z saldem większym od zera.
 
 Commit: `Panel administracyjny do zarządzania użytkownikami`
 
@@ -187,6 +224,13 @@ Do wyjaśnienia na obronie:
 
 Sprawdzam: przelew większy niż saldo, na własne konto, na nieistniejący numer, kwota `0` i `-5`.
 
+Testy `TransferTest`:
+
+- [ ] poprawny przelew zmniejsza saldo nadawcy, zwiększa saldo odbiorcy i tworzy wpis w `transfers`,
+- [ ] przed potwierdzeniem salda się nie zmieniają,
+- [ ] ponowne wysłanie potwierdzenia nie wykonuje przelewu drugi raz,
+- [ ] przelew bez środków, na własne konto, na nieistniejący numer oraz kwoty `0` i `-5` są odrzucane, a salda bez zmian.
+
 Commit: `Przelewy między klientami`
 
 ## Krok 7. Historia przelewów
@@ -198,6 +242,11 @@ Commit: `Przelewy między klientami`
 - [ ] link do historii i ostatnie przelewy na stronie klienta.
 
 Sprawdzam: klient widzi tylko własne przelewy.
+
+Testy `TransferHistoryTest`:
+
+- [ ] nadawca i odbiorca widzą przelew, a osoba trzecia nie,
+- [ ] po usunięciu drugiej strony przelew dalej jest w historii.
 
 Commit: `Historia przelewów`
 
@@ -220,6 +269,12 @@ Używam wbudowanej weryfikacji Laravela:
 
 Sprawdzam: nowe konto nie ma dostępu do `/dashboard`, a po kliknięciu linku w Mailpit (http://localhost:8025) ma.
 
+Testy `EmailVerificationTest`:
+
+- [ ] rejestracja wysyła powiadomienie `VerifyEmail`,
+- [ ] nieaktywne konto jest przekierowane na `/email/verify`,
+- [ ] poprawny podpisany link (`URL::temporarySignedRoute`) aktywuje konto, a zmieniony nie.
+
 Commit: `Aktywacja konta przez e-mail`
 
 ## Krok 9. Wyrażenia regularne (ocena dobra lub wyższa)
@@ -236,6 +291,10 @@ Reguły z `regex:` zapisuję jako tablicę, bo znak `|` w regexie psuje zapis te
 
 Na obronie trzeba umieć przeczytać każde z tych wyrażeń znak po znaku.
 
+Testy dopisuję do `AuthTest` i `TransferTest`:
+
+- [ ] dla każdego wyrażenia przynajmniej jedna wartość poprawna i jedna błędna, np. numer konta z 25 cyframi, kwota `10.999`, hasło bez cyfry.
+
 Commit: `Walidacja wyrażeniami regularnymi`
 
 ## Krok 10. SQL Injection i pozostałe zabezpieczenia (ocena dobra lub wyższa)
@@ -250,6 +309,12 @@ User::where('email', 'like', '%'.$request->query('q').'%')->paginate(20);
 ```
 
 - [ ] pokaz na obronie: wpisanie `' OR 1=1 --` w wyszukiwarkę i logowanie nic nie daje, a `DB::listen` lub log zapytań pokazuje `?` w SQL.
+
+Testy `SqlInjectionTest`:
+
+- [ ] `' OR 1=1 --` w wyszukiwarce nie zwraca żadnego użytkownika,
+- [ ] `' OR 1=1 --` jako e-mail przy logowaniu nie loguje,
+- [ ] `'; DROP TABLE users; --` w wyszukiwarce nie usuwa tabeli.
 
 Pozostałe zabezpieczenia do omówienia:
 
@@ -266,6 +331,8 @@ Commit: `Wyszukiwarka użytkowników i przegląd zabezpieczeń`
 
 ## Krok 11. Przygotowanie do oddania
 
+Wszystkie testy muszą przechodzić: `./vendor/bin/sail test`.
+
 Pełny test ręczny na czystej bazie (`./vendor/bin/sail artisan migrate:fresh --seed`):
 
 - [ ] rejestracja, mail, aktywacja, logowanie, wylogowanie,
@@ -277,7 +344,7 @@ Pełny test ręczny na czystej bazie (`./vendor/bin/sail artisan migrate:fresh -
 
 Do zrobienia:
 
-- [ ] `README.md`: opis, uruchomienie, dane kont testowych z seedera,
+- [ ] `README.md`: opis, uruchomienie (w tym `npm install` i `npm run build`), dane kont testowych z seedera,
 - [ ] w środowisku oddania `APP_DEBUG=false`, jeśli aplikacja będzie pokazywana poza komputerem lokalnym.
 
 Do powtórzenia przed obroną:

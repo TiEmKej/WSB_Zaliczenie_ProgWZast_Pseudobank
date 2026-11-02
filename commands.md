@@ -23,21 +23,19 @@ Wszystko uruchamiane w kontenerze przez Sail. Opcjonalny skrót: `alias sail='./
 ./vendor/bin/sail artisan route:list    # lista tras
 ./vendor/bin/sail artisan about         # informacje o aplikacji
 ./vendor/bin/sail artisan key:generate  # wygeneruj APP_KEY
-./vendor/bin/sail tinker                # konsola do eksperymentów
+./vendor/bin/sail artisan config:show session  # aktualne ustawienia sesji
 ```
 
 ### Generowanie kodu
 
 ```bash
-./vendor/bin/sail artisan make:model Account -mfs     # model + migracja + factory + seeder
-./vendor/bin/sail artisan make:model Account -a       # model + wszystko (kontroler, request, policy...)
-./vendor/bin/sail artisan make:controller AccountController --resource
-./vendor/bin/sail artisan make:migration create_transactions_table
-./vendor/bin/sail artisan make:request StoreTransferRequest
+./vendor/bin/sail artisan make:model Transfer -m      # model + migracja
+./vendor/bin/sail artisan make:controller AuthController
+./vendor/bin/sail artisan make:controller Admin/UserController --resource
+./vendor/bin/sail artisan make:middleware IsAdmin
+./vendor/bin/sail artisan make:migration create_transfers_table
 ./vendor/bin/sail artisan make:seeder AccountSeeder
-./vendor/bin/sail artisan make:factory AccountFactory
-./vendor/bin/sail artisan make:test TransferTest         # test feature
-./vendor/bin/sail artisan make:test TransferTest --unit  # test unit
+./vendor/bin/sail artisan make:test TransferTest      # test w tests/Feature
 ```
 
 ### Baza danych
@@ -60,24 +58,15 @@ Wszystko uruchamiane w kontenerze przez Sail. Opcjonalny skrót: `alias sail='./
 ./vendor/bin/sail artisan route:clear
 ./vendor/bin/sail artisan view:clear
 ./vendor/bin/sail artisan cache:clear
+./vendor/bin/sail artisan config:publish   # skopiuj domyślny plik konfiguracji do config/
 ```
 
 ## Testy
 
 ```bash
-./vendor/bin/sail composer test                         # czyści config i odpala testy
-./vendor/bin/sail test                                  # wszystkie testy
+./vendor/bin/sail test                      # wszystkie testy
 ./vendor/bin/sail test --filter=TransferTest
-./vendor/bin/sail test tests/Feature
-./vendor/bin/sail bin phpunit
-```
-
-## Formatowanie kodu (Pint)
-
-```bash
-./vendor/bin/sail bin pint           # napraw styl
-./vendor/bin/sail bin pint --test    # tylko sprawdź
-./vendor/bin/sail bin pint --dirty   # tylko zmienione pliki
+./vendor/bin/sail bin phpunit               # bezpośrednio przez PHPUnit
 ```
 
 ## Composer
@@ -88,7 +77,6 @@ Wszystko uruchamiane w kontenerze przez Sail. Opcjonalny skrót: `alias sail='./
 ./vendor/bin/sail composer require vendor/package
 ./vendor/bin/sail composer require vendor/package --dev
 ./vendor/bin/sail composer dump-autoload
-./vendor/bin/sail composer setup     # install + .env + key + migrate + npm build
 ```
 
 ## Frontend (npm / Vite)
@@ -99,11 +87,11 @@ Wszystko uruchamiane w kontenerze przez Sail. Opcjonalny skrót: `alias sail='./
 ./vendor/bin/sail npm run build      # build produkcyjny
 ```
 
-## Kolejki i logi
+## Poczta i logi
 
 ```bash
-./vendor/bin/sail artisan queue:work     # worker kolejki
-./vendor/bin/sail artisan queue:listen   # worker z przeładowaniem kodu
-./vendor/bin/sail artisan queue:failed   # nieudane zadania
-./vendor/bin/sail artisan pail           # logi na żywo
+./vendor/bin/sail logs -f                # logi kontenerów na żywo
+tail -f storage/logs/laravel.log         # logi aplikacji
 ```
+
+Skrzynka Mailpit: http://localhost:8025
