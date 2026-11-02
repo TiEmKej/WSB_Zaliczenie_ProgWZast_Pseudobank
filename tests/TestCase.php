@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -10,7 +11,7 @@ abstract class TestCase extends BaseTestCase
     {
         $user = new User([
             'name' => 'Test User',
-            'email' => fake()->unique()->safeEmail(),
+            'email' => uniqid().'@example.com',
             'password' => 'Haslo123',
         ]);
         $user->forceFill(['role' => $role, 'email_verified_at' => now()])->save();
