@@ -12,4 +12,6 @@
         <p class="text-sm text-slate-500">Saldo</p>
         <p class="text-3xl font-semibold">{{ number_format($user->balance, 2, ',', ' ') }} zł</p>
     </div>
+
+    <a href="{{ route('transfers.create') }}" class="mt-4 inline-block rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Nowy przelew</a>
 @endsection

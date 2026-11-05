@@ -20,13 +20,15 @@ Zasady:
 | 3. Rejestracja, logowanie, wylogowanie | zrobiony, 12 testów przechodzi |
 | 4. Uprawnienia i strony zależne od roli | zrobiony |
 | 5. Panel administracyjny (CRUD) | zrobiony |
-| 6. Przelewy | następny |
-| 7–11 | do zrobienia |
+| 6. Przelewy | zrobiony |
+| 7. Historia przelewów | następny |
+| 8–11 | do zrobienia |
 
 Zmiany względem planu:
 
 - doinstalowany `laravel/tinker` do sprawdzania danych w bazie,
 - Faker nie jest zainstalowany, więc `createUser()` w `tests/TestCase.php` używa `uniqid()` do e-maila,
+- trasy przelewów mają middleware `auth` i `client` (własny `IsClient`), a `verified` dochodzi w kroku 8,
 - layout leży w `resources/views/layouts/app.blade.php`,
 - konta z seedera: `admin@example.com`, `piekarskim@example.com`, `uczelnis@example.com`, hasło `Haslo123`.
 
@@ -212,9 +214,9 @@ Trasy są w grupie `auth`, `verified`, dostępne tylko dla klientów.
 
 Walidacja:
 
-- [ ] odbiorca istnieje i jest klientem: `Rule::exists('users', 'account_number')->where('role', 'user')`,
-- [ ] odbiorca to nie ja: `Rule::notIn([$user->account_number])`,
-- [ ] kwota większa od zera, tytuł wymagany.
+- [x] odbiorca istnieje i jest klientem: `Rule::exists('users', 'account_number')->where('role', 'user')`,
+- [x] odbiorca to nie ja: `Rule::notIn([$user->account_number])`,
+- [x] kwota większa od zera, tytuł wymagany.
 
 Wykonanie w transakcji, z ponownym sprawdzeniem salda pod blokadą:
 
@@ -247,10 +249,10 @@ Sprawdzam: przelew większy niż saldo, na własne konto, na nieistniejący nume
 
 Testy `TransferTest`:
 
-- [ ] poprawny przelew zmniejsza saldo nadawcy, zwiększa saldo odbiorcy i tworzy wpis w `transfers`,
-- [ ] przed potwierdzeniem salda się nie zmieniają,
-- [ ] ponowne wysłanie potwierdzenia nie wykonuje przelewu drugi raz,
-- [ ] przelew bez środków, na własne konto, na nieistniejący numer oraz kwoty `0` i `-5` są odrzucane, a salda bez zmian.
+- [x] poprawny przelew zmniejsza saldo nadawcy, zwiększa saldo odbiorcy i tworzy wpis w `transfers`,
+- [x] przed potwierdzeniem salda się nie zmieniają,
+- [x] ponowne wysłanie potwierdzenia nie wykonuje przelewu drugi raz,
+- [x] przelew bez środków, na własne konto, na nieistniejący numer oraz kwoty `0` i `-5` są odrzucane, a salda bez zmian.
 
 Commit: `Przelewy między klientami`
 
