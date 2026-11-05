@@ -18,8 +18,8 @@ Zasady:
 | 1. Uruchomienie projektu | zrobiony |
 | 2. Baza danych i role | zrobiony |
 | 3. Rejestracja, logowanie, wylogowanie | zrobiony, 12 testów przechodzi |
-| 4. Uprawnienia i strony zależne od roli | następny |
-| 5–11 | do zrobienia |
+| 4. Uprawnienia i strony zależne od roli | zrobiony |
+| 5–11 | do zrobienia (następny: 5) |
 
 Zmiany względem planu:
 
@@ -149,18 +149,18 @@ Commit: `Rejestracja i logowanie`
 
 ## Krok 4. Uprawnienia i strony zależne od roli
 
-- [ ] middleware `IsAdmin` (`artisan make:middleware IsAdmin`), który dla innych ról zwraca `abort(403)`,
-- [ ] alias w `bootstrap/app.php`: `$middleware->alias(['admin' => IsAdmin::class]);`,
-- [ ] trasa `GET /dashboard` o nazwie `dashboard`: administratora przekierowuje do `/admin/users`, a klientowi pokazuje numer konta i saldo,
-- [ ] `/` przekierowuje do `dashboard` albo `login`.
+- [x] middleware `IsAdmin` (`artisan make:middleware IsAdmin`), który dla innych ról zwraca `abort(403)`,
+- [x] alias w `bootstrap/app.php`: `$middleware->alias(['admin' => IsAdmin::class]);`,
+- [x] trasa `GET /dashboard` o nazwie `dashboard`: administratora przekierowuje do `/admin/users`, a klientowi pokazuje numer konta i saldo,
+- [x] `/` przekierowuje do `dashboard` albo `login`.
 
 Sprawdzam: klient wchodzący na `/admin/users` dostaje 403, a niezalogowany trafia na logowanie.
 
 Testy `RoleAccessTest`:
 
-- [ ] klient na `/admin/users` dostaje 403, a administrator 200,
-- [ ] niezalogowany jest przekierowany na `/login`,
-- [ ] `/dashboard` pokazuje klientowi saldo, a administratora przekierowuje do panelu.
+- [x] klient na `/admin/users` dostaje 403, a administrator 200,
+- [x] niezalogowany jest przekierowany na `/login`,
+- [x] `/dashboard` pokazuje klientowi saldo, a administratora przekierowuje do panelu.
 
 Commit: `Role i strona klienta z saldem`
 
