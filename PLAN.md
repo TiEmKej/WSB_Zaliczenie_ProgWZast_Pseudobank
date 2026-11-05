@@ -19,7 +19,9 @@ Zasady:
 | 2. Baza danych i role | zrobiony |
 | 3. Rejestracja, logowanie, wylogowanie | zrobiony, 12 testów przechodzi |
 | 4. Uprawnienia i strony zależne od roli | zrobiony |
-| 5–11 | do zrobienia (następny: 5) |
+| 5. Panel administracyjny (CRUD) | zrobiony |
+| 6. Przelewy | następny |
+| 7–11 | do zrobienia |
 
 Zmiany względem planu:
 
@@ -182,18 +184,18 @@ Route::resource('admin/users', UserController::class)->names('admin.users');
 
 Reguły:
 
-- [ ] przy edycji e-maila: `Rule::unique('users')->ignore($user)`,
-- [ ] rola tylko z listy: `Rule::in(['user', 'admin'])`,
-- [ ] administrator nie może usunąć swojego konta ani odebrać sobie roli,
-- [ ] nie można usunąć klienta z saldem większym od zera,
-- [ ] saldo nie jest edytowalne, zmieniają je tylko przelewy.
+- [x] przy edycji e-maila: `Rule::unique('users')->ignore($user)`,
+- [x] rola tylko z listy: `Rule::in(['user', 'admin'])`,
+- [x] administrator nie może usunąć swojego konta ani odebrać sobie roli,
+- [x] nie można usunąć klienta z saldem większym od zera,
+- [x] saldo nie jest edytowalne, zmieniają je tylko przelewy.
 
 Testy `AdminUserTest`:
 
-- [ ] lista i podgląd działają, dodawanie, edycja i usuwanie zmieniają bazę,
-- [ ] edycja z pustym hasłem nie zmienia hasła,
-- [ ] administrator nie może usunąć siebie ani odebrać sobie roli,
-- [ ] nie można usunąć klienta z saldem większym od zera.
+- [x] lista i podgląd działają, dodawanie, edycja i usuwanie zmieniają bazę,
+- [x] edycja z pustym hasłem nie zmienia hasła,
+- [x] administrator nie może usunąć siebie ani odebrać sobie roli,
+- [x] nie można usunąć klienta z saldem większym od zera.
 
 Commit: `Panel administracyjny do zarządzania użytkownikami`
 

@@ -23,7 +23,7 @@
         </div>
     </nav>
 
-    <main class="mx-auto max-w-md p-6">
+    <main class="mx-auto @yield('width', 'max-w-md') p-6">
         @if (session('status'))
             <div class="mb-4 rounded bg-green-100 p-3 text-green-800">{{ session('status') }}</div>
         @endif

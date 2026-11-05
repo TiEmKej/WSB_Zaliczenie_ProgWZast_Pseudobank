@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 
@@ -18,6 +19,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::middleware('admin')->group(function () {
-        Route::view('/admin/users', 'admin.users')->name('admin.users.index');
+        Route::resource('admin/users', UserController::class)->names('admin.users');
     });
 });
