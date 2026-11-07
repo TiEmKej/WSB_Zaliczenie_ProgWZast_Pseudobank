@@ -12,7 +12,8 @@ Stos: Laravel 13, widoki Blade, Tailwind CSS (Vite), MariaDB i Mailpit w kontene
 - klient: numer konta w formacie `00 0000 0000 ...`, saldo, przelewy z potwierdzeniem (dane w sesji; formularz: numer konta, nazwa i adres odbiorcy, kwota, tytuł, z widocznym kontem źródłowym i saldem), historia przelewów z przyciskiem „Powtórz”, książka odbiorców,
 - profil użytkownika z danymi (także data urodzenia i płeć odczytane z PESEL),
 - administrator: dodawanie, podgląd, edycja i usuwanie użytkowników oraz wyszukiwarka po e-mailu,
-- walidacja formularzy (w tym wyrażenia regularne), ochrona przed SQL Injection, XSS i CSRF.
+- walidacja formularzy (w tym wyrażenia regularne) z komunikatami przy polach, ochrona przed SQL Injection, XSS i CSRF,
+- układ responsywny (telefon i komputer): tabele na telefonie zamieniają się w listy, a przelew prowadzi przez stepper z trzema krokami.
 
 ## Uruchomienie
 
@@ -29,6 +30,10 @@ composer install
 ```
 
 Podczas pracy nad wyglądem zamiast `npm run build` można uruchomić `./vendor/bin/sail npm run dev`.
+
+## Wygląd
+
+Style są w `resources/css/app.css`: Tailwind CSS 4 i własne klasy komponentów (`.btn`, `.card`, `.field`, `.alert`, `.data-list`, `.table-wrap` i inne) zapisane przez `@apply`. Powtarzalne elementy formularzy i nawigacji to komponenty Blade w `resources/views/components` (`x-field`, `x-select`, `x-stepper`, `x-logo`, `x-role-badge`). Czcionka to Instrument Sans, ikona strony to `public/favicon.svg`.
 
 - aplikacja: http://localhost
 - skrzynka Mailpit (maile z linkami aktywacyjnymi): http://localhost:8025

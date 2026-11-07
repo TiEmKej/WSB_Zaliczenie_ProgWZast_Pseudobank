@@ -129,3 +129,13 @@ Generator („Generuj poprawny PESEL”): losuje datę, koduje miesiąc dla wiek
 ## 11. Format numeru konta
 
 [AccountNumber.php](app/Support/AccountNumber.php): `format()` robi `29 5234 6767 1873 3454 8751 4799` (dwie cyfry, potem grupy po cztery), a `normalize()` usuwa spacje z wpisanego numeru przed walidacją. W bazie numer jest zawsze zapisany bez spacji (`char(26)`), formatowanie dotyczy tylko wyświetlania.
+
+## 12. Widoki Blade i wygląd
+
+- **Layout:** `layouts/app.blade.php` ma nagłówek z nawigacją zależną od roli, komunikat `session('status')` i zbiorczy alert błędów (`$errors->keys()`, każdy błąd jest linkiem do pola). Widoki rozszerzają go przez `@extends`, a szerokość ustawia `@section('width', ...)`.
+- **Komponenty Blade** (`resources/views/components`): plik `field.blade.php` to `<x-field>`. Przyjmuje `name`, `label`, `value` i inne (`@props`), sam odczytuje błąd z `$errors->first($name)` i dodaje `aria-invalid` oraz `aria-describedby`. Dzięki temu każde pole ma etykietę i błąd w jednym miejscu, a nazwy pól formularzy zostały bez zmian.
+- **Style:** Tailwind CSS 4 przez Vite. Powtarzalne zestawy klas (`.btn-primary`, `.card`, `.field`) są w `app.css` pod `@layer components` i `@apply`, więc widoki są krótsze. Po zmianie klas trzeba przebudować frontend (`npm run build` albo `npm run dev`).
+- **Responsywność:** tabele na telefonie są ukryte (`hidden sm:table`), a w tym samym miejscu pokazuje się lista (`sm:hidden`) z tych samych danych.
+- **Dostępność:** etykiety `label for`, `aria-current` w menu i kroku przelewu, `role="alert"` przy błędach, cele dotykowe min. 44 px, kolory dobrane do kontrastu AA. Znak `−` lub `+` przy kwocie, więc informacja nie zależy tylko od koloru.
+- **Bezpieczeństwo bez zmian:** nadal `{{ }}` (escapowanie), `@csrf` i `@method` w każdym formularzu.
+

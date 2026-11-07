@@ -48,6 +48,19 @@ Do kroku 4: `/` ma przekierowywać do `dashboard` albo `login`, więc `HomeTest`
 - profil użytkownika (`/profile`),
 - formularz przelewu: numer konta, nazwa i adres odbiorcy (zapisywane w `transfers` i w książce odbiorców), kwota, tytuł; formularz i potwierdzenie pokazują konto, z którego idzie przelew, i jego saldo (na potwierdzeniu także saldo po przelewie).
 
+## Nowy wygląd
+
+Zmiana dotyczy tylko widoków Blade i stylów, bez zmian w kontrolerach, trasach, walidacji i nazwach pól formularzy.
+
+- paleta: tło `stone-100`, tekst i przyciski `emerald-950`, akcent `lime-300`, kwoty wychodzące `red-700`, przychodzące `emerald-700`,
+- `resources/css/app.css`: klasy komponentów przez `@apply` (przyciski, karta, pole, alerty, lista danych, tabela, plakietki, chipy),
+- komponenty Blade w `resources/views/components`: `x-field` (etykieta, pole i komunikat błędu przy polu), `x-select`, `x-stepper` (kroki przelewu), `x-logo`, `x-role-badge`,
+- layout: nawigacja z `aria-current`, zbiorczy alert błędów z linkami do pól, komunikat sukcesu,
+- tabele (historia, odbiorcy, użytkownicy) na telefonie są listami kart,
+- formularze rejestracji i panelu administracyjnego są w dwóch kolumnach od szerokości `sm`.
+
+Nie zrobione, bo wymaga zmian poza widokami: osobny ekran „Wykonano" po przelewie (dziś jest komunikat na koncie), własny widok paginacji i okno `<dialog>` zamiast `confirm()`.
+
 ## Testy
 
 Testy PHPUnit są w `tests/Feature` i uruchamia je `./vendor/bin/sail test`. Korzystają z osobnej bazy `testing` w MariaDB, więc nie naruszają danych aplikacji.

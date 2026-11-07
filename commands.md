@@ -84,8 +84,10 @@ Wszystko uruchamiane w kontenerze przez Sail. Opcjonalny skrót: `alias sail='./
 ```bash
 ./vendor/bin/sail npm install
 ./vendor/bin/sail npm run dev        # Vite z hot reload
-./vendor/bin/sail npm run build      # build produkcyjny
+./vendor/bin/sail npm run build      # build produkcyjny (po zmianie widoków lub klas Tailwinda)
 ```
+
+Bez `npm run dev` albo wcześniejszego `npm run build` strony z `@vite` kończą się błędem o braku manifestu. Testy nie wymagają builda, bo używają `withoutVite()`.
 
 ## Poczta i logi
 
