@@ -45,7 +45,8 @@ Link ma postać `/email/verify/{id}/{hash}?expires=...&signature=...`.
 | Migracja | Co robi |
 | --- | --- |
 | `0001_01_01_000000_create_users_table` | tabela `users`: `role` (domyślnie `user`), `account_number` `char(26)` unikalny, `balance` `decimal(12,2)` domyślnie 1000 |
-| `2026_11_02_172820_create_transfers_table` | tabela `transfers`: `sender_id` i `recipient_id` (klucze obce do `users`, `nullable`, `nullOnDelete()`), `amount`, `title`, `timestamps` |
+| `2026_11_02_172820_create_transfers_table` | tabela `transfers`: `sender_id` i `recipient_id` (klucze obce do `users`, `nullable`, `nullOnDelete()`), `recipient_name` i `recipient_address` (dane odbiorcy z formularza), `amount`, `title`, `timestamps` |
+| `2026_11_08_100000_create_recipients_table` | tabela `recipients` (książka odbiorców): `user_id` (klucz obcy, `cascadeOnDelete()`), `name`, `address`, `account_number`, unikalna para `(user_id, account_number)` |
 
 - `decimal` zamiast `float`, bo pieniądze nie mogą mieć błędów zaokrągleń.
 - `nullOnDelete()`: po usunięciu użytkownika historia przelewów drugiej strony zostaje, a w widoku jest „konto usunięte”.
@@ -60,6 +61,8 @@ Link ma postać `/email/verify/{id}/{hash}?expires=...&signature=...`.
 | Numer konta | `/^\d{26}$/` | dokładnie 26 cyfr |
 | Kwota | `/^\d{1,10}(\.\d{1,2})?$/` | 1–10 cyfr, opcjonalnie kropka i 1–2 cyfry (`10`, `10.5`, `10.99`, ale nie `10.999` ani `10,50`) |
 | Tytuł | `/^[\pL\d\s.,\-]{3,140}$/u` | 3–140 znaków: litery, cyfry, spacje, kropka, przecinek, myślnik |
+| Nazwa odbiorcy | `/^[\pL\d\s.,'\-]{2,100}$/u` | jak imię, ale dopuszcza cyfry, kropkę, przecinek i apostrof (np. `O'Neil`) |
+| Adres odbiorcy | `/^[\pL\d\s.,\-\/]{3,150}$/u` | litery, cyfry, spacje, kropka, przecinek, myślnik i ukośnik (np. `ul. Polna 3/5, 00-950 Łódź`) |
 
 `^` i `$` to początek i koniec tekstu (bez nich wystarczyłby fragment pasujący), `{n,m}` to liczba powtórzeń, `?` oznacza „opcjonalnie”. Reguły są zapisane w tablicach, bo znak `|` w regexie psułby zapis tekstowy. Miejsca: [AuthController.php](app/Http/Controllers/AuthController.php), [UserController.php](app/Http/Controllers/Admin/UserController.php), [TransferController.php:31-36](app/Http/Controllers/TransferController.php#L31-L36).
 
@@ -80,6 +83,7 @@ DB::transaction(function () {
 - **`orderBy('id')`:** blokady zawsze zakładamy w tej samej kolejności. Gdy A płaci B, a B płaci A jednocześnie, bez stałej kolejności każdy trzymałby swój wiersz i czekał na drugi (zakleszczenie).
 - Suma sald przed przelewem i po nim jest taka sama (test w [TransferTest.php](tests/Feature/TransferTest.php)).
 - Kwoty są sprawdzane regexem, `numeric` i `gt:0`, a odbiorca: istnieje, jest klientem, to nie nadawca.
+- Formularz zbiera: numer konta, nazwę i adres odbiorcy, kwotę i tytuł. Nazwa i adres to dane z formularza (jak w prawdziwym przelewie), zapisane w `transfers`; konto odbiorcy identyfikuje wyłącznie numer. Na formularzu i potwierdzeniu widać konto źródłowe z saldem, a na potwierdzeniu także saldo po przelewie.
 
 ## 8. Zabezpieczenia w skrócie
 
@@ -117,9 +121,10 @@ Generator („Generuj poprawny PESEL”): losuje datę, koduje miesiąc dla wiek
 
 ## 10. Książka odbiorców i powtórzenie przelewu
 
-- Tabela `recipients` (`user_id`, `name`, `account_number`) ma klucz obcy `user_id` z `cascadeOnDelete()`, więc odbiorcy znikają razem z właścicielem, oraz unikalność pary `(user_id, account_number)`. Dwie osoby mogą zapisać to samo konto, ale jedna nie może zapisać go dwa razy.
+- Tabela `recipients` (`user_id`, `name`, `address`, `account_number`) ma klucz obcy `user_id` z `cascadeOnDelete()`, więc odbiorcy znikają razem z właścicielem, oraz unikalność pary `(user_id, account_number)`. Dwie osoby mogą zapisać to samo konto, ale jedna nie może zapisać go dwa razy.
 - Przy usuwaniu sprawdzam, czy odbiorca należy do zalogowanego (`abort_unless(..., 403)`), bo samo `{recipient}` w adresie można podmienić. To samo przy powtarzaniu przelewu: tylko nadawca może go powtórzyć.
-- Powtórzenie to `POST /transfers/{transfer}/repeat`. Dane przelewu trafiają przez te same reguły walidacji i sprawdzenie salda co zwykły przelew, a potem do sesji i na ekran potwierdzenia. Nic nie jest wykonywane bez drugiego kliknięcia.
+- Wybranie odbiorcy z książki (`/transfers/create?recipient=ID`, tylko własnego) wypełnia numer konta, nazwę i adres. Zaznaczenie „Zapisz odbiorcę” dodaje go do książki dopiero po wykonaniu przelewu (`firstOrCreate`, więc bez duplikatów).
+- Powtórzenie to `POST /transfers/{transfer}/repeat`, z nazwą i adresem zapisanymi w pierwotnym przelewie. Dane przelewu trafiają przez te same reguły walidacji i sprawdzenie salda co zwykły przelew, a potem do sesji i na ekran potwierdzenia. Nic nie jest wykonywane bez drugiego kliknięcia.
 
 ## 11. Format numeru konta
 
