@@ -11,11 +11,13 @@ class UserController extends Controller
 {
     private const MESSAGES = [
         'name.required' => 'Podaj imię i nazwisko.',
+        'name.regex' => 'Imię i nazwisko może zawierać tylko litery, spacje i myślniki.',
         'email.required' => 'Podaj adres e-mail.',
         'email.email' => 'Adres e-mail ma nieprawidłowy format.',
         'email.unique' => 'Ten adres e-mail jest już zajęty.',
         'password.required' => 'Podaj hasło.',
         'password.min' => 'Hasło musi mieć co najmniej 8 znaków.',
+        'password.regex' => 'Hasło musi zawierać małą i wielką literę oraz cyfrę.',
         'role.required' => 'Wybierz rolę.',
         'role.in' => 'Wybrana rola jest nieprawidłowa.',
     ];
@@ -38,9 +40,9 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:100'],
+            'name' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\-]{2,100}$/u'],
             'email' => ['required', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'min:8'],
+            'password' => ['required', 'min:8', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/'],
             'role' => ['required', Rule::in(['user', 'admin'])],
         ], self::MESSAGES);
 
@@ -58,9 +60,9 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:100'],
+            'name' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\-]{2,100}$/u'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user)],
-            'password' => ['nullable', 'min:8'],
+            'password' => ['nullable', 'min:8', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/'],
             'role' => ['required', Rule::in(['user', 'admin'])],
         ], self::MESSAGES);
 

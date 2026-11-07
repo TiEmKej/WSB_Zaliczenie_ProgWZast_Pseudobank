@@ -149,4 +149,35 @@ class TransferTest extends TestCase
         auth()->logout();
         $this->get('/transfers/create')->assertRedirect('/login');
     }
+
+    public function test_numer_konta_sprawdza_wyrazenie_regularne(): void
+    {
+        $numer = $this->recipient->account_number;
+
+        foreach ([substr($numer, 0, 25), $numer.'1', substr($numer, 0, 25).'a'] as $zly) {
+            $this->zlozPrzelew(['account_number' => $zly])->assertSessionHasErrors('account_number');
+        }
+
+        $this->zlozPrzelew()->assertSessionHasNoErrors();
+    }
+
+    public function test_kwota_sprawdza_wyrazenie_regularne(): void
+    {
+        foreach (['10.999', '10,50', '1e3', '12345678901', '.5'] as $zla) {
+            $this->zlozPrzelew(['amount' => $zla])->assertSessionHasErrors('amount');
+        }
+
+        foreach (['10', '10.5', '10.99'] as $dobra) {
+            $this->zlozPrzelew(['amount' => $dobra])->assertSessionHasNoErrors();
+        }
+    }
+
+    public function test_tytul_sprawdza_wyrazenie_regularne(): void
+    {
+        foreach (['ab', '<script>', 'Tytul; DROP', str_repeat('a', 141)] as $zly) {
+            $this->zlozPrzelew(['title' => $zly])->assertSessionHasErrors('title');
+        }
+
+        $this->zlozPrzelew(['title' => 'Zwrot za bilety, nr 12-3.'])->assertSessionHasNoErrors();
+    }
 }

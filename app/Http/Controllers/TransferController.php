@@ -28,21 +28,23 @@ class TransferController extends Controller
         $data = $request->validate([
             'account_number' => [
                 'required',
+                'regex:/^\d{26}$/',
                 Rule::exists('users', 'account_number')->where('role', 'user'),
                 Rule::notIn([$user->account_number]),
             ],
-            'amount' => ['required', 'numeric', 'gt:0', 'max:9999999999'],
-            'title' => ['required', 'string', 'max:140'],
+            'amount' => ['required', 'regex:/^\d{1,10}(\.\d{1,2})?$/', 'numeric', 'gt:0'],
+            'title' => ['required', 'string', 'regex:/^[\pL\d\s.,\-]{3,140}$/u'],
         ], [
             'account_number.required' => 'Podaj numer konta odbiorcy.',
+            'account_number.regex' => 'Numer konta musi składać się z 26 cyfr.',
             'account_number.exists' => 'Nie ma takiego konta odbiorcy.',
             'account_number.not_in' => 'Nie możesz wysłać przelewu na własne konto.',
             'amount.required' => 'Podaj kwotę.',
             'amount.numeric' => 'Kwota musi być liczbą.',
             'amount.gt' => 'Kwota musi być większa od zera.',
-            'amount.max' => 'Kwota jest zbyt duża.',
+            'amount.regex' => 'Kwota może mieć maksymalnie 2 miejsca po kropce.',
             'title.required' => 'Podaj tytuł przelewu.',
-            'title.max' => 'Tytuł może mieć najwyżej 140 znaków.',
+            'title.regex' => 'Tytuł musi mieć od 3 do 140 znaków: litery, cyfry i podstawową interpunkcję.',
         ]);
 
         if ($user->fresh()->balance < $data['amount']) {

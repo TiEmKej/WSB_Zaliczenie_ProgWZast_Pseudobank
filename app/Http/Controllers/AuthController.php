@@ -17,17 +17,19 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:100'],
+            'name' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\-]{2,100}$/u'],
             'email' => ['required', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'confirmed', 'min:8'],
+            'password' => ['required', 'confirmed', 'min:8', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/'],
         ], [
             'name.required' => 'Podaj imię i nazwisko.',
+            'name.regex' => 'Imię i nazwisko może zawierać tylko litery, spacje i myślniki.',
             'email.required' => 'Podaj adres e-mail.',
             'email.email' => 'Adres e-mail ma nieprawidłowy format.',
             'email.unique' => 'Ten adres e-mail jest już zajęty.',
             'password.required' => 'Podaj hasło.',
             'password.confirmed' => 'Hasła nie są takie same.',
             'password.min' => 'Hasło musi mieć co najmniej 8 znaków.',
+            'password.regex' => 'Hasło musi zawierać małą i wielką literę oraz cyfrę.',
         ]);
 
         $user = User::create($data);

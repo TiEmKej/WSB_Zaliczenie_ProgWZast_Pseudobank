@@ -23,8 +23,9 @@ Zasady:
 | 6. Przelewy | zrobiony |
 | 7. Historia przelewów | zrobiony |
 | 8. Aktywacja konta przez e-mail | zrobiony |
-| 9. Wyrażenia regularne | następny |
-| 10–11 | do zrobienia |
+| 9. Wyrażenia regularne | zrobiony |
+| 10. SQL Injection i zabezpieczenia | następny |
+| 11. Przygotowanie do oddania | do zrobienia |
 
 Zmiany względem planu:
 
@@ -319,7 +320,7 @@ Na obronie trzeba umieć przeczytać każde z tych wyrażeń znak po znaku.
 
 Testy dopisuję do `AuthTest` i `TransferTest`:
 
-- [ ] dla każdego wyrażenia przynajmniej jedna wartość poprawna i jedna błędna, np. numer konta z 25 cyframi, kwota `10.999`, hasło bez cyfry.
+- [x] dla każdego wyrażenia przynajmniej jedna wartość poprawna i jedna błędna, np. numer konta z 25 cyframi, kwota `10.999`, hasło bez cyfry.
 
 Commit: `Walidacja wyrażeniami regularnymi`
 

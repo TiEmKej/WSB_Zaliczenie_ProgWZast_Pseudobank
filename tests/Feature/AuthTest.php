@@ -118,4 +118,27 @@ class AuthTest extends TestCase
     {
         $this->actingAs($this->createUser())->get('/login')->assertRedirect();
     }
+
+    public function test_imie_i_nazwisko_sprawdza_wyrazenie_regularne(): void
+    {
+        Notification::fake();
+
+        foreach (['Jan123', 'Jan_Kowalski', 'J', 'Jan <b>'] as $imie) {
+            $this->post('/register', $this->dane(['name' => $imie]))->assertSessionHasErrors('name');
+        }
+
+        $this->post('/register', $this->dane(['name' => 'Żaneta Nowak-Kowalska']))->assertSessionHasNoErrors();
+    }
+
+    public function test_haslo_sprawdza_wyrazenie_regularne(): void
+    {
+        Notification::fake();
+
+        foreach (['Haslobezcyfry', 'haslo1234', 'HASLO1234', 'Haslo12'] as $haslo) {
+            $this->post('/register', $this->dane(['password' => $haslo, 'password_confirmation' => $haslo]))
+                ->assertSessionHasErrors('password');
+        }
+
+        $this->post('/register', $this->dane())->assertSessionHasNoErrors();
+    }
 }
