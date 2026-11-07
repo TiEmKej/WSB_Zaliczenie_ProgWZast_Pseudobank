@@ -4,9 +4,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DevController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RecipientController;
 use App\Http\Controllers\TransferController;
 
 Route::redirect('/', '/dashboard');
+
+if (! app()->isProduction()) {
+    Route::get('/dev/pesel', [DevController::class, 'pesel'])->name('dev.pesel');
+}
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
@@ -28,7 +35,13 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+
     Route::middleware('client')->group(function () {
+        Route::get('/recipients', [RecipientController::class, 'index'])->name('recipients.index');
+        Route::post('/recipients', [RecipientController::class, 'store'])->name('recipients.store');
+        Route::delete('/recipients/{recipient}', [RecipientController::class, 'destroy'])->name('recipients.destroy');
+        Route::post('/transfers/{transfer}/repeat', [TransferController::class, 'repeat'])->name('transfers.repeat');
         Route::get('/transfers', [TransferController::class, 'index'])->name('transfers.index');
         Route::get('/transfers/create', [TransferController::class, 'create'])->name('transfers.create');
         Route::post('/transfers', [TransferController::class, 'store'])->name('transfers.store');

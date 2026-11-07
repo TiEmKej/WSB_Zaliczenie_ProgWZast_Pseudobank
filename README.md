@@ -6,10 +6,11 @@ Stos: Laravel 13, widoki Blade, Tailwind CSS (Vite), MariaDB i Mailpit w kontene
 
 ## Funkcje
 
-- rejestracja, logowanie i wylogowanie, hasła hashowane bcryptem,
+- rejestracja z numerem PESEL (suma kontrolna, data urodzenia, zgodność z wybraną płcią), logowanie i wylogowanie, hasła hashowane bcryptem,
 - aktywacja konta linkiem z e-maila,
 - dwie role: klient i administrator, z różnymi stronami po zalogowaniu,
-- klient: numer konta, saldo, przelewy z potwierdzeniem (dane w sesji), historia przelewów,
+- klient: numer konta w formacie `00 0000 0000 ...`, saldo, przelewy z potwierdzeniem (dane w sesji), historia przelewów z przyciskiem „Powtórz”, książka odbiorców,
+- profil użytkownika z danymi (także data urodzenia i płeć odczytane z PESEL),
 - administrator: dodawanie, podgląd, edycja i usuwanie użytkowników oraz wyszukiwarka po e-mailu,
 - walidacja formularzy (w tym wyrażenia regularne), ochrona przed SQL Injection, XSS i CSRF.
 
@@ -33,6 +34,10 @@ Podczas pracy nad wyglądem zamiast `npm run build` można uruchomić `./vendor/
 - skrzynka Mailpit (maile z linkami aktywacyjnymi): http://localhost:8025
 
 Przy pierwszej instalacji, gdy `vendor/` jeszcze nie istnieje, `composer install` trzeba uruchomić lokalnie albo przez kontener `laravelsail/php85-composer`.
+
+## Narzędzie deweloperskie
+
+Na formularzu rejestracji (i dodawania użytkownika w panelu) jest przycisk „Generuj poprawny PESEL”. Losuje numer zgodny z wybraną płcią. Przycisk i trasa `/dev/pesel` istnieją tylko poza środowiskiem `production`.
 
 ## Konta testowe
 

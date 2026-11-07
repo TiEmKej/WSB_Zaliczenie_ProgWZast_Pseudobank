@@ -43,7 +43,7 @@ class RoleAccessTest extends TestCase
 
         $this->actingAs($user)->get('/dashboard')
             ->assertOk()
-            ->assertSee($user->account_number)
+            ->assertSee($user->formattedAccountNumber())
             ->assertSee('1 000,00');
     }
 

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Rules\ValidPesel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -15,6 +17,11 @@ class UserController extends Controller
         'email.required' => 'Podaj adres e-mail.',
         'email.email' => 'Adres e-mail ma nieprawidłowy format.',
         'email.unique' => 'Ten adres e-mail jest już zajęty.',
+        'gender.required' => 'Wybierz płeć.',
+        'gender.in' => 'Wybrana płeć jest nieprawidłowa.',
+        'pesel.required' => 'Podaj numer PESEL.',
+        'pesel.regex' => 'PESEL musi składać się z 11 cyfr.',
+        'pesel.unique' => 'Ten numer PESEL jest już zarejestrowany.',
         'password.required' => 'Podaj hasło.',
         'password.min' => 'Hasło musi mieć co najmniej 8 znaków.',
         'password.regex' => 'Hasło musi zawierać małą i wielką literę oraz cyfrę.',
@@ -49,11 +56,13 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\-]{2,100}$/u'],
             'email' => ['required', 'email', 'max:255', 'unique:users'],
+            'gender' => ['required', 'in:K,M'],
+            'pesel' => ['bail', 'required', 'regex:/^\d{11}$/', 'unique:users', new ValidPesel($request->input('gender'))],
             'password' => ['required', 'min:8', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/'],
             'role' => ['required', Rule::in(['user', 'admin'])],
         ], self::MESSAGES);
 
-        $user = new User($data);
+        $user = new User(Arr::except($data, 'gender'));
         $user->forceFill(['role' => $data['role'], 'email_verified_at' => now()])->save();
 
         return redirect()->route('admin.users.index')->with('status', 'Użytkownik został dodany.');
@@ -69,6 +78,8 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\-]{2,100}$/u'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user)],
+            'gender' => ['required', 'in:K,M'],
+            'pesel' => ['bail', 'required', 'regex:/^\d{11}$/', Rule::unique('users')->ignore($user), new ValidPesel($request->input('gender'))],
             'password' => ['nullable', 'min:8', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/'],
             'role' => ['required', Rule::in(['user', 'admin'])],
         ], self::MESSAGES);
@@ -81,7 +92,7 @@ class UserController extends Controller
             unset($data['password']);
         }
 
-        $user->fill($data)->forceFill(['role' => $data['role']])->save();
+        $user->fill(Arr::except($data, 'gender'))->forceFill(['role' => $data['role']])->save();
 
         return redirect()->route('admin.users.index')->with('status', 'Użytkownik został zapisany.');
     }

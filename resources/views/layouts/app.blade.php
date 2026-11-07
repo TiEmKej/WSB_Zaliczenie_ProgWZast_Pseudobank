@@ -11,7 +11,15 @@
         <a href="/" class="text-xl font-semibold">Pseudobank</a>
         <div class="flex items-center gap-4">
             @auth
-                <span>{{ auth()->user()->name }}</span>
+                @if (auth()->user()->hasVerifiedEmail())
+                    @if (auth()->user()->role === 'user')
+                        <a href="{{ route('transfers.index') }}" class="text-blue-600 hover:underline">Przelewy</a>
+                        <a href="{{ route('recipients.index') }}" class="text-blue-600 hover:underline">Odbiorcy</a>
+                    @endif
+                    <a href="{{ route('profile') }}" class="text-blue-600 hover:underline">{{ auth()->user()->name }}</a>
+                @else
+                    <span>{{ auth()->user()->name }}</span>
+                @endif
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button class="text-blue-600 hover:underline">Wyloguj</button>

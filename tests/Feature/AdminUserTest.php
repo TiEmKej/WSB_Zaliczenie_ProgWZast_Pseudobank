@@ -26,6 +26,8 @@ class AdminUserTest extends TestCase
         return array_merge([
             'name' => 'Anna Nowak',
             'email' => 'anna@example.com',
+            'gender' => 'K',
+            'pesel' => '02070803628',
             'password' => 'Haslo123',
             'role' => 'user',
         ], $zmiany);
@@ -36,7 +38,7 @@ class AdminUserTest extends TestCase
         $user = $this->createUser();
 
         $this->get('/admin/users')->assertOk()->assertSee($user->email);
-        $this->get("/admin/users/{$user->id}")->assertOk()->assertSee($user->account_number);
+        $this->get("/admin/users/{$user->id}")->assertOk()->assertSee($user->formattedAccountNumber());
     }
 
     public function test_klient_nie_ma_dostepu_do_crud(): void
@@ -139,5 +141,24 @@ class AdminUserTest extends TestCase
         $this->put("/admin/users/{$user->id}", $this->dane(['balance' => 999999]));
 
         $this->assertEquals(1000, $user->fresh()->balance);
+    }
+
+    public function test_administrator_dodaje_uzytkownika_tylko_z_poprawnym_peselem(): void
+    {
+        $this->post('/admin/users', $this->dane(['pesel' => '44051401358']))->assertSessionHasErrors('pesel');
+        $this->post('/admin/users', $this->dane(['gender' => 'M']))->assertSessionHasErrors('pesel');
+        $this->post('/admin/users', $this->dane(['pesel' => '']))->assertSessionHasErrors('pesel');
+        $this->post('/admin/users', $this->dane())->assertSessionHasNoErrors();
+
+        $this->assertSame('02070803628', User::where('email', 'anna@example.com')->value('pesel'));
+    }
+
+    public function test_edycja_pozwala_zachowac_wlasny_pesel(): void
+    {
+        $user = $this->createUser();
+        $pesel = $user->pesel;
+
+        $this->put("/admin/users/{$user->id}", $this->dane(['pesel' => $pesel, 'password' => '']))
+            ->assertSessionHasNoErrors();
     }
 }

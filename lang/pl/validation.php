@@ -35,5 +35,7 @@ return [
         'account_number' => 'numer konta',
         'amount' => 'kwota',
         'title' => 'tytuł',
+        'pesel' => 'PESEL',
+        'gender' => 'płeć',
     ],
 ];

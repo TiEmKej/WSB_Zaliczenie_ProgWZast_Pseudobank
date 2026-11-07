@@ -14,6 +14,7 @@
             <label for="email" class="block">E-mail</label>
             <input id="email" name="email" value="{{ old('email') }}" class="w-full rounded border p-2">
         </div>
+        @include('partials.pesel-fields', ['user' => new App\Models\User])
         <div>
             <label for="password" class="block">Hasło</label>
             <input id="password" type="password" name="password" class="w-full rounded border p-2">

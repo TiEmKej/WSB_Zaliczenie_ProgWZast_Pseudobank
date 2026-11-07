@@ -17,6 +17,7 @@ class UserTest extends TestCase
             'name' => 'Jan Kowalski',
             'email' => 'jan@example.com',
             'password' => 'Haslo123',
+            'pesel' => '44051401359',
         ]);
 
         $this->assertNotSame('Haslo123', $user->password);

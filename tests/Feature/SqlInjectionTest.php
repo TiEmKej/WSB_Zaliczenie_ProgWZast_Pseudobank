@@ -21,7 +21,7 @@ class SqlInjectionTest extends TestCase
     {
         $admin = $this->createUser('admin');
         $this->createUser();
-        $szukany = new User(['name' => 'Anna Nowak', 'email' => 'anna.szukana@example.com', 'password' => 'Haslo123']);
+        $szukany = new User(['name' => 'Anna Nowak', 'email' => 'anna.szukana@example.com', 'password' => 'Haslo123', 'pesel' => '02070803628']);
         $szukany->save();
 
         $this->actingAs($admin)->get('/admin/users?q=szukana')

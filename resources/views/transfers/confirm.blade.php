@@ -7,7 +7,7 @@
 
     <dl class="space-y-2 rounded bg-white p-6 shadow">
         <div><dt class="text-sm text-slate-500">Odbiorca</dt><dd>{{ $recipient?->name }}</dd></div>
-        <div><dt class="text-sm text-slate-500">Numer konta</dt><dd class="font-mono">{{ $pending['account_number'] }}</dd></div>
+        <div><dt class="text-sm text-slate-500">Numer konta</dt><dd class="font-mono">{{ App\Support\AccountNumber::format($pending['account_number']) }}</dd></div>
         <div><dt class="text-sm text-slate-500">Kwota</dt><dd>{{ number_format($pending['amount'], 2, ',', ' ') }} zł</dd></div>
         <div><dt class="text-sm text-slate-500">Tytuł</dt><dd>{{ $pending['title'] }}</dd></div>
     </dl>

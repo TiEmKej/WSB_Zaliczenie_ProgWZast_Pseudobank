@@ -42,6 +42,8 @@ class EmailVerificationTest extends TestCase
         $this->post('/register', [
             'name' => 'Jan Kowalski',
             'email' => 'jan@example.com',
+            'gender' => 'M',
+            'pesel' => '44051401359',
             'password' => 'Haslo123',
             'password_confirmation' => 'Haslo123',
         ])->assertRedirect('/email/verify');

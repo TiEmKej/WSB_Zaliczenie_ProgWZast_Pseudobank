@@ -38,6 +38,15 @@ Zmiany względem planu:
 
 Do kroku 4: `/` ma przekierowywać do `dashboard` albo `login`, więc `HomeTest` trzeba przerobić, a `/admin/users` na razie jest tymczasową trasą do czasu kroku 5.
 
+## Rozszerzenia po kroku 11
+
+- numer konta wyświetlany jako `00 0000 0000 0000 0000 0000 0000` (`App\Support\AccountNumber`), przy wpisywaniu spacje są ignorowane,
+- PESEL przy rejestracji i w panelu administracyjnym (`App\Support\Pesel`, reguła `ValidPesel`): 11 cyfr, suma kontrolna, poprawna data urodzenia (z kodowaniem wieku w miesiącu), zgodność płci z przedostatnią cyfrą,
+- przycisk „Generuj poprawny PESEL” i trasa `/dev/pesel` tylko poza produkcją,
+- książka odbiorców (tabela `recipients`, `RecipientController`) i zapis odbiorcy przy przelewie,
+- powtórzenie przelewu z historii (`POST /transfers/{transfer}/repeat`) prowadzi do zwykłego potwierdzenia,
+- profil użytkownika (`/profile`).
+
 ## Testy
 
 Testy PHPUnit są w `tests/Feature` i uruchamia je `./vendor/bin/sail test`. Korzystają z osobnej bazy `testing` w MariaDB, więc nie naruszają danych aplikacji.

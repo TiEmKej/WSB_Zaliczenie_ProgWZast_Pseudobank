@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Rules\ValidPesel;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
@@ -19,6 +21,8 @@ class AuthController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\-]{2,100}$/u'],
             'email' => ['required', 'email', 'max:255', 'unique:users'],
+            'gender' => ['required', 'in:K,M'],
+            'pesel' => ['bail', 'required', 'regex:/^\d{11}$/', 'unique:users', new ValidPesel($request->input('gender'))],
             'password' => ['required', 'confirmed', 'min:8', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/'],
         ], [
             'name.required' => 'Podaj imię i nazwisko.',
@@ -26,13 +30,18 @@ class AuthController extends Controller
             'email.required' => 'Podaj adres e-mail.',
             'email.email' => 'Adres e-mail ma nieprawidłowy format.',
             'email.unique' => 'Ten adres e-mail jest już zajęty.',
+            'gender.required' => 'Wybierz płeć.',
+            'gender.in' => 'Wybrana płeć jest nieprawidłowa.',
+            'pesel.required' => 'Podaj numer PESEL.',
+            'pesel.regex' => 'PESEL musi składać się z 11 cyfr.',
+            'pesel.unique' => 'Ten numer PESEL jest już zarejestrowany.',
             'password.required' => 'Podaj hasło.',
             'password.confirmed' => 'Hasła nie są takie same.',
             'password.min' => 'Hasło musi mieć co najmniej 8 znaków.',
             'password.regex' => 'Hasło musi zawierać małą i wielką literę oraz cyfrę.',
         ]);
 
-        $user = User::create($data);
+        $user = User::create(Arr::except($data, 'gender'));
 
         Auth::login($user);
         $request->session()->regenerate();

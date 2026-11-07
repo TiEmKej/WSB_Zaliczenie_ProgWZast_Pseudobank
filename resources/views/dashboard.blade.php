@@ -8,7 +8,7 @@
 
     <div class="rounded bg-white p-6 shadow">
         <p class="text-sm text-slate-500">Numer konta</p>
-        <p class="mb-4 font-mono">{{ $user->account_number }}</p>
+        <p class="mb-4 font-mono">{{ $user->formattedAccountNumber() }}</p>
 
         <p class="text-sm text-slate-500">Saldo</p>
         <p class="text-3xl font-semibold">{{ number_format($user->balance, 2, ',', ' ') }} zł</p>

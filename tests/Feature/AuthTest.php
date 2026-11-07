@@ -23,6 +23,8 @@ class AuthTest extends TestCase
         return array_merge([
             'name' => 'Jan Kowalski',
             'email' => 'jan@example.com',
+            'gender' => 'M',
+            'pesel' => '44051401359',
             'password' => 'Haslo123',
             'password_confirmation' => 'Haslo123',
         ], $zmiany);
@@ -140,5 +142,52 @@ class AuthTest extends TestCase
         }
 
         $this->post('/register', $this->dane())->assertSessionHasNoErrors();
+    }
+
+    public function test_pesel_jest_wymagany_przy_rejestracji(): void
+    {
+        Notification::fake();
+
+        $this->post('/register', $this->dane(['pesel' => '']))->assertSessionHasErrors('pesel');
+        $this->post('/register', $this->dane(['gender' => '']))->assertSessionHasErrors('gender');
+        $this->assertDatabaseCount('users', 0);
+    }
+
+    public function test_zly_pesel_jest_odrzucony(): void
+    {
+        Notification::fake();
+
+        foreach (['4405140135', '44051401358', '44051401359a', '99999999999'] as $pesel) {
+            $this->post('/register', $this->dane(['pesel' => $pesel]))->assertSessionHasErrors('pesel');
+        }
+
+        $this->assertDatabaseCount('users', 0);
+    }
+
+    public function test_pesel_o_innej_plci_niz_wybrana_jest_odrzucony(): void
+    {
+        Notification::fake();
+
+        $this->post('/register', $this->dane(['gender' => 'K']))
+            ->assertSessionHasErrors(['pesel' => 'Płeć zapisana w numerze PESEL nie zgadza się z wybraną płcią.']);
+
+        $this->assertDatabaseCount('users', 0);
+    }
+
+    public function test_zajety_pesel_jest_odrzucony(): void
+    {
+        Notification::fake();
+        $this->createUser()->forceFill(['pesel' => '44051401359'])->save();
+
+        $this->post('/register', $this->dane())->assertSessionHasErrors('pesel');
+    }
+
+    public function test_pesel_poprawnej_plci_jest_zapisywany(): void
+    {
+        Notification::fake();
+
+        $this->post('/register', $this->dane(['gender' => 'M']))->assertSessionHasNoErrors();
+
+        $this->assertSame('44051401359', User::where('email', 'jan@example.com')->value('pesel'));
     }
 }

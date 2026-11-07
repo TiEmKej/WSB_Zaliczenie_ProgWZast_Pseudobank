@@ -5,6 +5,7 @@
             <th class="p-3">Druga strona</th>
             <th class="p-3">Tytuł</th>
             <th class="p-3 text-right">Kwota</th>
+            <th class="p-3"></th>
         </tr>
     </thead>
     <tbody>
@@ -20,9 +21,17 @@
                 <td class="p-3 text-right {{ $outgoing ? 'text-red-600' : 'text-green-600' }}">
                     {{ $outgoing ? '−' : '+' }}{{ number_format($transfer->amount, 2, ',', ' ') }} zł
                 </td>
+                <td class="p-3 text-right">
+                    @if ($outgoing && $other)
+                        <form method="POST" action="{{ route('transfers.repeat', $transfer) }}">
+                            @csrf
+                            <button class="text-blue-600 hover:underline">Powtórz</button>
+                        </form>
+                    @endif
+                </td>
             </tr>
         @empty
-            <tr><td colspan="4" class="p-3 text-center text-slate-500">Brak przelewów.</td></tr>
+            <tr><td colspan="5" class="p-3 text-center text-slate-500">Brak przelewów.</td></tr>
         @endforelse
     </tbody>
 </table>
