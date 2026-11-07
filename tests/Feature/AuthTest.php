@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -35,7 +36,9 @@ class AuthTest extends TestCase
 
     public function test_rejestracja_tworzy_uzytkownika_z_zahashowanym_haslem_i_rola_user(): void
     {
-        $this->post('/register', $this->dane())->assertRedirect('/');
+        Notification::fake();
+
+        $this->post('/register', $this->dane())->assertRedirect('/email/verify');
 
         $user = User::where('email', 'jan@example.com')->first();
 

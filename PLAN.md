@@ -22,14 +22,16 @@ Zasady:
 | 5. Panel administracyjny (CRUD) | zrobiony |
 | 6. Przelewy | zrobiony |
 | 7. Historia przelewów | zrobiony |
-| 8. Aktywacja konta przez e-mail | następny |
-| 9–11 | do zrobienia |
+| 8. Aktywacja konta przez e-mail | zrobiony |
+| 9. Wyrażenia regularne | następny |
+| 10–11 | do zrobienia |
 
 Zmiany względem planu:
 
 - doinstalowany `laravel/tinker` do sprawdzania danych w bazie,
 - Faker nie jest zainstalowany, więc `createUser()` w `tests/TestCase.php` używa `uniqid()` do e-maila,
-- trasy przelewów mają middleware `auth` i `client` (własny `IsClient`), a `verified` dochodzi w kroku 8,
+- trasy przelewów mają middleware `auth`, `verified` i `client` (własny `IsClient`),
+- opcjonalna polska treść maila aktywacyjnego nie została zrobiona,
 - layout leży w `resources/views/layouts/app.blade.php`,
 - konta z seedera: `admin@example.com`, `piekarskim@example.com`, `uczelnis@example.com`, hasło `Haslo123`.
 
@@ -278,9 +280,9 @@ Commit: `Historia przelewów`
 
 Używam wbudowanej weryfikacji Laravela:
 
-- [ ] `User implements MustVerifyEmail`,
-- [ ] po rejestracji: `Auth::login($user)` i `$user->sendEmailVerificationNotification()`,
-- [ ] trasy:
+- [x] `User implements MustVerifyEmail`,
+- [x] po rejestracji: `Auth::login($user)` i `$user->sendEmailVerificationNotification()`,
+- [x] trasy:
 
 | Trasa | Nazwa | Middleware | Działanie |
 | --- | --- | --- | --- |
@@ -288,16 +290,16 @@ Używam wbudowanej weryfikacji Laravela:
 | `GET /email/verify/{id}/{hash}` | `verification.verify` | `auth`, `signed` | `EmailVerificationRequest`, `$request->fulfill()` |
 | `POST /email/verification-notification` | `verification.send` | `auth`, `throttle:6,1` | ponowna wysyłka |
 
-- [ ] middleware `verified` na trasach klienta i panelu administracyjnym,
+- [x] middleware `verified` na trasach klienta i panelu administracyjnym,
 - [ ] polska treść maila przez `VerifyEmail::toMailUsing()` (opcjonalnie).
 
 Sprawdzam: nowe konto nie ma dostępu do `/dashboard`, a po kliknięciu linku w Mailpit (http://localhost:8025) ma.
 
 Testy `EmailVerificationTest`:
 
-- [ ] rejestracja wysyła powiadomienie `VerifyEmail`,
-- [ ] nieaktywne konto jest przekierowane na `/email/verify`,
-- [ ] poprawny podpisany link (`URL::temporarySignedRoute`) aktywuje konto, a zmieniony nie.
+- [x] rejestracja wysyła powiadomienie `VerifyEmail`,
+- [x] nieaktywne konto jest przekierowane na `/email/verify`,
+- [x] poprawny podpisany link (`URL::temporarySignedRoute`) aktywuje konto, a zmieniony nie.
 
 Commit: `Aktywacja konta przez e-mail`
 
