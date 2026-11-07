@@ -20,6 +20,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::middleware('client')->group(function () {
+        Route::get('/transfers', [TransferController::class, 'index'])->name('transfers.index');
         Route::get('/transfers/create', [TransferController::class, 'create'])->name('transfers.create');
         Route::post('/transfers', [TransferController::class, 'store'])->name('transfers.store');
         Route::get('/transfers/confirm', [TransferController::class, 'confirm'])->name('transfers.confirm');

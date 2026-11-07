@@ -21,8 +21,9 @@ Zasady:
 | 4. Uprawnienia i strony zależne od roli | zrobiony |
 | 5. Panel administracyjny (CRUD) | zrobiony |
 | 6. Przelewy | zrobiony |
-| 7. Historia przelewów | następny |
-| 8–11 | do zrobienia |
+| 7. Historia przelewów | zrobiony |
+| 8. Aktywacja konta przez e-mail | następny |
+| 9–11 | do zrobienia |
 
 Zmiany względem planu:
 
@@ -258,18 +259,18 @@ Commit: `Przelewy między klientami`
 
 ## Krok 7. Historia przelewów
 
-- [ ] `GET /transfers`: przelewy, w których jestem nadawcą lub odbiorcą, od najnowszych, z paginacją,
-- [ ] kolumny: data, druga strona, tytuł, kwota (wychodzące na minus, przychodzące na plus),
-- [ ] `with(['sender', 'recipient'])`, żeby nie wykonywać zapytania dla każdego wiersza,
-- [ ] jeśli druga strona to `null`, wyświetlam „konto usunięte”,
-- [ ] link do historii i ostatnie przelewy na stronie klienta.
+- [x] `GET /transfers`: przelewy, w których jestem nadawcą lub odbiorcą, od najnowszych, z paginacją,
+- [x] kolumny: data, druga strona, tytuł, kwota (wychodzące na minus, przychodzące na plus),
+- [x] `with(['sender', 'recipient'])`, żeby nie wykonywać zapytania dla każdego wiersza,
+- [x] jeśli druga strona to `null`, wyświetlam „konto usunięte”,
+- [x] link do historii i ostatnie przelewy na stronie klienta.
 
 Sprawdzam: klient widzi tylko własne przelewy.
 
 Testy `TransferHistoryTest`:
 
-- [ ] nadawca i odbiorca widzą przelew, a osoba trzecia nie,
-- [ ] po usunięciu drugiej strony przelew dalej jest w historii.
+- [x] nadawca i odbiorca widzą przelew, a osoba trzecia nie,
+- [x] po usunięciu drugiej strony przelew dalej jest w historii.
 
 Commit: `Historia przelewów`
 

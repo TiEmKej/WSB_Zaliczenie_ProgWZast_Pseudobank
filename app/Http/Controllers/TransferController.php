@@ -11,6 +11,11 @@ use Illuminate\Validation\ValidationException;
 
 class TransferController extends Controller
 {
+    public function index(Request $request)
+    {
+        return view('transfers.index', ['transfers' => $request->user()->transfers()->paginate(20)]);
+    }
+
     public function create()
     {
         return view('transfers.create');

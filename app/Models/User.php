@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\Notifiable;
 
 #[Fillable(['name', 'email', 'password'])]
@@ -38,6 +39,13 @@ class User extends Authenticatable
 
             $user->account_number = $number;
         });
+    }
+
+    public function transfers(): Builder
+    {
+        return Transfer::where(function (Builder $query) {
+            $query->where('sender_id', $this->id)->orWhere('recipient_id', $this->id);
+        })->with(['sender', 'recipient'])->latest()->latest('id');
     }
 
     public function isAdmin(): bool

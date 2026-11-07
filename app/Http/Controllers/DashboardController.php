@@ -14,6 +14,9 @@ class DashboardController extends Controller
             return redirect()->route('admin.users.index');
         }
 
-        return view('dashboard', ['user' => $user]);
+        return view('dashboard', [
+            'user' => $user,
+            'transfers' => $user->transfers()->take(5)->get(),
+        ]);
     }
 }
