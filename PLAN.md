@@ -25,7 +25,7 @@ Zasady:
 | 8. Aktywacja konta przez e-mail | zrobiony |
 | 9. Wyrażenia regularne | zrobiony |
 | 10. SQL Injection i zabezpieczenia | zrobiony |
-| 11. Przygotowanie do oddania | następny |
+| 11. Przygotowanie do oddania | zrobiony |
 
 Zmiany względem planu:
 
@@ -362,17 +362,17 @@ Wszystkie testy muszą przechodzić: `./vendor/bin/sail test`.
 
 Pełny test ręczny na czystej bazie (`./vendor/bin/sail artisan migrate:fresh --seed`):
 
-- [ ] rejestracja, mail, aktywacja, logowanie, wylogowanie,
-- [ ] puste formularze i błędne dane dają komunikaty po polsku,
-- [ ] klient: saldo, przelew, potwierdzenie, historia po obu stronach,
-- [ ] administrator: dodanie, podgląd, edycja, usunięcie, lista,
-- [ ] klient nie ma dostępu do panelu, a niezalogowany do żadnej strony poza logowaniem i rejestracją,
-- [ ] suma sald wszystkich kont jest taka sama przed przelewami i po nich.
+- [x] rejestracja, mail, aktywacja, logowanie, wylogowanie,
+- [x] puste formularze i błędne dane dają komunikaty po polsku,
+- [x] klient: saldo, przelew, potwierdzenie, historia po obu stronach,
+- [x] administrator: dodanie, podgląd, edycja, usunięcie, lista,
+- [x] klient nie ma dostępu do panelu, a niezalogowany do żadnej strony poza logowaniem i rejestracją,
+- [x] suma sald wszystkich kont jest taka sama przed przelewami i po nich.
 
 Do zrobienia:
 
-- [ ] `README.md`: opis, uruchomienie (w tym `npm install` i `npm run build`), dane kont testowych z seedera,
-- [ ] w środowisku oddania `APP_DEBUG=false`, jeśli aplikacja będzie pokazywana poza komputerem lokalnym.
+- [x] `README.md`: opis, uruchomienie (w tym `npm install` i `npm run build`), dane kont testowych z seedera,
+- [x] w środowisku oddania `APP_DEBUG=false`, jeśli aplikacja będzie pokazywana poza komputerem lokalnym.
 
 Do powtórzenia przed obroną:
 

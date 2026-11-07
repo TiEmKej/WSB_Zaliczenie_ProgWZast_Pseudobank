@@ -180,4 +180,17 @@ class TransferTest extends TestCase
 
         $this->zlozPrzelew(['title' => 'Zwrot za bilety, nr 12-3.'])->assertSessionHasNoErrors();
     }
+
+    public function test_suma_sald_jest_taka_sama_przed_i_po_przelewach(): void
+    {
+        $suma = fn () => User::sum('balance');
+        $przed = $suma();
+
+        $this->zlozPrzelew(['amount' => '123.45']);
+        $this->post('/transfers/confirm');
+        $this->zlozPrzelew(['amount' => '0.01']);
+        $this->post('/transfers/confirm');
+
+        $this->assertEquals($przed, $suma());
+    }
 }
