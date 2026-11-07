@@ -49,6 +49,11 @@ class User extends Authenticatable implements MustVerifyEmail
         })->with(['sender', 'recipient'])->latest()->latest('id');
     }
 
+    public function roleLabel(): string
+    {
+        return $this->role === 'admin' ? 'administrator' : 'klient';
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';

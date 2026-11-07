@@ -17,8 +17,8 @@
 <div>
     <label for="role" class="block">Rola</label>
     <select id="role" name="role" class="w-full rounded border p-2">
-        @foreach (['user', 'admin'] as $role)
-            <option value="{{ $role }}" @selected(old('role', $user->role ?? 'user') === $role)>{{ $role }}</option>
+        @foreach (['user' => 'klient', 'admin' => 'administrator'] as $role => $label)
+            <option value="{{ $role }}" @selected(old('role', $user->role ?? 'user') === $role)>{{ $label }}</option>
         @endforeach
     </select>
 </div>

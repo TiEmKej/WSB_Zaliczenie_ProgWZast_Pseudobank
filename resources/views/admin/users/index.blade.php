@@ -24,7 +24,7 @@
                 <tr class="border-b">
                     <td class="p-3">{{ $user->name }}</td>
                     <td class="p-3">{{ $user->email }}</td>
-                    <td class="p-3">{{ $user->role }}</td>
+                    <td class="p-3">{{ $user->roleLabel() }}</td>
                     <td class="p-3 text-right">{{ number_format($user->balance, 2, ',', ' ') }} zł</td>
                     <td class="flex justify-end gap-3 p-3">
                         <a href="{{ route('admin.users.show', $user) }}" class="text-blue-600 hover:underline">Podgląd</a>

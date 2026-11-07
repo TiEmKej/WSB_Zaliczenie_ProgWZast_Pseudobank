@@ -7,7 +7,7 @@
 
     <dl class="space-y-2 rounded bg-white p-6 shadow">
         <div><dt class="text-sm text-slate-500">E-mail</dt><dd>{{ $user->email }}</dd></div>
-        <div><dt class="text-sm text-slate-500">Rola</dt><dd>{{ $user->role }}</dd></div>
+        <div><dt class="text-sm text-slate-500">Rola</dt><dd>{{ $user->roleLabel() }}</dd></div>
         <div><dt class="text-sm text-slate-500">Numer konta</dt><dd class="font-mono">{{ $user->account_number }}</dd></div>
         <div><dt class="text-sm text-slate-500">Saldo</dt><dd>{{ number_format($user->balance, 2, ',', ' ') }} zł</dd></div>
     </dl>
