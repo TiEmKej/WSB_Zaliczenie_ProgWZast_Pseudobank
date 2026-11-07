@@ -27,6 +27,8 @@ class RepeatTransferTest extends TestCase
         return Transfer::create([
             'sender_id' => $this->sender->id,
             'recipient_id' => $this->recipient->id,
+            'recipient_name' => 'Właściciel Mieszkania',
+            'recipient_address' => 'ul. Lipowa 7, Kraków',
             'amount' => $kwota,
             'title' => 'Czynsz',
         ]);
@@ -38,7 +40,7 @@ class RepeatTransferTest extends TestCase
 
         $this->actingAs($this->sender)->post("/transfers/{$przelew->id}/repeat")->assertRedirect('/transfers/confirm');
 
-        $this->get('/transfers/confirm')->assertSee('Czynsz')->assertSee('100,50')->assertSee($this->recipient->name);
+        $this->get('/transfers/confirm')->assertSee('Czynsz')->assertSee('100,50')->assertSee('Właściciel Mieszkania')->assertSee('ul. Lipowa 7, Kraków');
         $this->assertDatabaseCount('transfers', 1);
         $this->assertEquals(1000, $this->sender->fresh()->balance);
     }
@@ -51,6 +53,7 @@ class RepeatTransferTest extends TestCase
         $this->post('/transfers/confirm')->assertRedirect('/dashboard');
 
         $this->assertDatabaseCount('transfers', 2);
+        $this->assertSame(2, Transfer::where('recipient_name', 'Właściciel Mieszkania')->where('recipient_address', 'ul. Lipowa 7, Kraków')->count());
         $this->assertEquals(899.50, $this->sender->fresh()->balance);
         $this->assertEquals(1100.50, $this->recipient->fresh()->balance);
     }

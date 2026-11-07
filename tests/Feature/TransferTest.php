@@ -27,6 +27,8 @@ class TransferTest extends TestCase
     {
         return array_merge([
             'account_number' => $this->recipient->account_number,
+            'recipient_name' => 'Jan Kowalski',
+            'recipient_address' => 'ul. Długa 5, 00-001 Warszawa',
             'amount' => '100.50',
             'title' => 'Za obiad',
         ], $zmiany);
@@ -55,6 +57,8 @@ class TransferTest extends TestCase
         $this->assertDatabaseHas('transfers', [
             'sender_id' => $this->sender->id,
             'recipient_id' => $this->recipient->id,
+            'recipient_name' => 'Jan Kowalski',
+            'recipient_address' => 'ul. Długa 5, 00-001 Warszawa',
             'amount' => '100.50',
             'title' => 'Za obiad',
         ]);
@@ -192,5 +196,62 @@ class TransferTest extends TestCase
         $this->post('/transfers/confirm');
 
         $this->assertEquals($przed, $suma());
+    }
+
+    public function test_formularz_pokazuje_konto_zrodlowe_i_saldo(): void
+    {
+        $this->get('/transfers/create')
+            ->assertOk()
+            ->assertSee('Przelew z konta')
+            ->assertSee($this->sender->formattedAccountNumber())
+            ->assertSee('1 000,00');
+    }
+
+    public function test_potwierdzenie_pokazuje_konto_dane_odbiorcy_i_saldo_po_przelewie(): void
+    {
+        $this->zlozPrzelew();
+
+        $this->get('/transfers/confirm')
+            ->assertOk()
+            ->assertSee($this->sender->formattedAccountNumber())
+            ->assertSee('1 000,00')
+            ->assertSee($this->recipient->formattedAccountNumber())
+            ->assertSee('Jan Kowalski')
+            ->assertSee('ul. Długa 5, 00-001 Warszawa')
+            ->assertSee('100,50')
+            ->assertSee('899,50');
+    }
+
+    public function test_formularz_ma_cztery_pola_przelewu(): void
+    {
+        $this->get('/transfers/create')
+            ->assertSee('name="account_number"', false)
+            ->assertSee('name="recipient_name"', false)
+            ->assertSee('name="recipient_address"', false)
+            ->assertSee('name="amount"', false)
+            ->assertSee('name="title"', false);
+    }
+
+    public function test_nazwa_i_adres_odbiorcy_sa_wymagane(): void
+    {
+        $this->zlozPrzelew(['recipient_name' => ''])
+            ->assertSessionHasErrors(['recipient_name' => 'Podaj nazwę odbiorcy.']);
+        $this->zlozPrzelew(['recipient_address' => ''])
+            ->assertSessionHasErrors(['recipient_address' => 'Podaj adres odbiorcy.']);
+
+        $this->assertSaldaBezZmian();
+    }
+
+    public function test_nazwa_i_adres_odbiorcy_sprawdzaja_wyrazenie_regularne(): void
+    {
+        foreach (['J', '<script>', 'Jan; DROP', str_repeat('a', 101)] as $zla) {
+            $this->zlozPrzelew(['recipient_name' => $zla])->assertSessionHasErrors('recipient_name');
+        }
+        foreach (['ul', '<b>adres</b>', str_repeat('a', 151)] as $zly) {
+            $this->zlozPrzelew(['recipient_address' => $zly])->assertSessionHasErrors('recipient_address');
+        }
+
+        $this->zlozPrzelew(['recipient_name' => "Anna O'Neil-Nowak", 'recipient_address' => 'ul. Polna 3/5, 00-950 Łódź'])
+            ->assertSessionHasNoErrors();
     }
 }

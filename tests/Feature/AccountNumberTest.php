@@ -52,6 +52,8 @@ class AccountNumberTest extends TestCase
 
         $this->actingAs($nadawca)->post('/transfers', [
             'account_number' => $odbiorca->formattedAccountNumber(),
+            'recipient_name' => 'Jan Kowalski',
+            'recipient_address' => 'ul. Długa 5, Warszawa',
             'amount' => '10',
             'title' => 'Za obiad',
         ])->assertRedirect('/transfers/confirm');

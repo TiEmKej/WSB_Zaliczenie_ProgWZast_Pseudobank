@@ -35,6 +35,8 @@ return [
         'account_number' => 'numer konta',
         'amount' => 'kwota',
         'title' => 'tytuł',
+        'recipient_name' => 'nazwa odbiorcy',
+        'recipient_address' => 'adres odbiorcy',
         'pesel' => 'PESEL',
         'gender' => 'płeć',
     ],

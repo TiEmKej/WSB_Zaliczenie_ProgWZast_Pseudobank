@@ -45,7 +45,8 @@ Do kroku 4: `/` ma przekierowywać do `dashboard` albo `login`, więc `HomeTest`
 - przycisk „Generuj poprawny PESEL” i trasa `/dev/pesel` tylko poza produkcją,
 - książka odbiorców (tabela `recipients`, `RecipientController`) i zapis odbiorcy przy przelewie,
 - powtórzenie przelewu z historii (`POST /transfers/{transfer}/repeat`) prowadzi do zwykłego potwierdzenia,
-- profil użytkownika (`/profile`).
+- profil użytkownika (`/profile`),
+- formularz przelewu: numer konta, nazwa i adres odbiorcy (zapisywane w `transfers` i w książce odbiorców), kwota, tytuł; formularz i potwierdzenie pokazują konto, z którego idzie przelew, i jego saldo (na potwierdzeniu także saldo po przelewie).
 
 ## Testy
 

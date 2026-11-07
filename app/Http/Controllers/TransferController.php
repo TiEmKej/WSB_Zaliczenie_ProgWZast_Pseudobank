@@ -18,6 +18,10 @@ class TransferController extends Controller
         'account_number.regex' => 'Numer konta musi składać się z 26 cyfr.',
         'account_number.exists' => 'Nie ma takiego konta odbiorcy.',
         'account_number.not_in' => 'Nie możesz wysłać przelewu na własne konto.',
+        'recipient_name.required' => 'Podaj nazwę odbiorcy.',
+        'recipient_name.regex' => 'Nazwa odbiorcy ma od 2 do 100 znaków: litery, cyfry, spacje oraz . , \' -',
+        'recipient_address.required' => 'Podaj adres odbiorcy.',
+        'recipient_address.regex' => 'Adres odbiorcy ma od 3 do 150 znaków: litery, cyfry, spacje oraz . , - /',
         'amount.required' => 'Podaj kwotę.',
         'amount.numeric' => 'Kwota musi być liczbą.',
         'amount.gt' => 'Kwota musi być większa od zera.',
@@ -38,7 +42,8 @@ class TransferController extends Controller
 
         return view('transfers.create', [
             'recipients' => $user->recipients,
-            'prefill' => $recipient?->account_number,
+            'prefill' => $recipient,
+            'user' => $user,
         ]);
     }
 
@@ -64,6 +69,8 @@ class TransferController extends Controller
 
         $data = Validator::make([
             'account_number' => $transfer->recipient->account_number,
+            'recipient_name' => $transfer->recipient_name,
+            'recipient_address' => $transfer->recipient_address,
             'amount' => $transfer->amount,
             'title' => $transfer->title,
         ], $this->rules($user), self::MESSAGES)->validate();
@@ -82,7 +89,11 @@ class TransferController extends Controller
 
         $recipient = User::where('account_number', $pending['account_number'])->first();
 
-        return view('transfers.confirm', ['pending' => $pending, 'recipient' => $recipient]);
+        return view('transfers.confirm', [
+            'pending' => $pending,
+            'recipient' => $recipient,
+            'user' => request()->user(),
+        ]);
     }
 
     public function execute(Request $request)
@@ -120,6 +131,8 @@ class TransferController extends Controller
             Transfer::create([
                 'sender_id' => $sender->id,
                 'recipient_id' => $recipient->id,
+                'recipient_name' => $pending['recipient_name'],
+                'recipient_address' => $pending['recipient_address'],
                 'amount' => $pending['amount'],
                 'title' => $pending['title'],
             ]);
@@ -128,7 +141,7 @@ class TransferController extends Controller
         if ($pending['save_recipient'] ?? false) {
             $sender->recipients()->firstOrCreate(
                 ['account_number' => $recipient->account_number],
-                ['name' => $recipient->name],
+                ['name' => $pending['recipient_name'], 'address' => $pending['recipient_address']],
             );
         }
 
@@ -144,6 +157,8 @@ class TransferController extends Controller
                 Rule::exists('users', 'account_number')->where('role', 'user'),
                 Rule::notIn([$user->account_number]),
             ],
+            'recipient_name' => ['required', 'regex:/^[\pL\d\s.,\'\-]{2,100}$/u'],
+            'recipient_address' => ['required', 'regex:/^[\pL\d\s.,\-\/]{3,150}$/u'],
             'amount' => ['required', 'regex:/^\d{1,10}(\.\d{1,2})?$/', 'numeric', 'gt:0'],
             'title' => ['required', 'string', 'regex:/^[\pL\d\s.,\-]{3,140}$/u'],
         ];

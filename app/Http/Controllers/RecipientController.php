@@ -20,7 +20,8 @@ class RecipientController extends Controller
         $request->merge(['account_number' => AccountNumber::normalize($request->input('account_number'))]);
 
         $data = $request->validate([
-            'name' => ['required', 'regex:/^[\pL\d\s.\-]{2,100}$/u'],
+            'name' => ['required', 'regex:/^[\pL\d\s.,\'\-]{2,100}$/u'],
+            'address' => ['required', 'regex:/^[\pL\d\s.,\-\/]{3,150}$/u'],
             'account_number' => [
                 'required',
                 'regex:/^\d{26}$/',
@@ -30,7 +31,9 @@ class RecipientController extends Controller
             ],
         ], [
             'name.required' => 'Podaj nazwę odbiorcy.',
-            'name.regex' => 'Nazwa odbiorcy ma od 2 do 100 znaków: litery, cyfry, spacje, kropki i myślniki.',
+            'name.regex' => 'Nazwa odbiorcy ma od 2 do 100 znaków: litery, cyfry, spacje oraz . , \' -',
+            'address.required' => 'Podaj adres odbiorcy.',
+            'address.regex' => 'Adres odbiorcy ma od 3 do 150 znaków: litery, cyfry, spacje oraz . , - /',
             'account_number.required' => 'Podaj numer konta odbiorcy.',
             'account_number.regex' => 'Numer konta musi składać się z 26 cyfr.',
             'account_number.exists' => 'Nie ma takiego konta odbiorcy.',

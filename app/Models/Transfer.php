@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['sender_id', 'recipient_id', 'amount', 'title'])]
+#[Fillable(['sender_id', 'recipient_id', 'recipient_name', 'recipient_address', 'amount', 'title'])]
 class Transfer extends Model
 {
     public function sender(): BelongsTo

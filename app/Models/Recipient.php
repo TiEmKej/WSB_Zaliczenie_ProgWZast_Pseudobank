@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['name', 'account_number'])]
+#[Fillable(['name', 'address', 'account_number'])]
 class Recipient extends Model
 {
     public function user(): BelongsTo

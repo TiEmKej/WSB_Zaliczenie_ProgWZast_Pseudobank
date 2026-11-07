@@ -21,6 +21,8 @@ class TransferHistoryTest extends TestCase
         return Transfer::create([
             'sender_id' => $nadawca->id,
             'recipient_id' => $odbiorca->id,
+            'recipient_name' => 'Jan Kowalski',
+            'recipient_address' => 'ul. Długa 5, Warszawa',
             'amount' => 25,
             'title' => $tytul,
         ]);

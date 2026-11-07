@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('sender_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('recipient_id')->nullable()->constrained('users')->nullOnDelete();
             $table->decimal('amount', 12, 2);
+            $table->string('recipient_name');
+            $table->string('recipient_address');
             $table->string('title');
             $table->timestamps();
         });

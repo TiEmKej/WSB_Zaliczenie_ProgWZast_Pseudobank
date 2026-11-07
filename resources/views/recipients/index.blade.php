@@ -9,7 +9,7 @@
     <table class="mb-8 w-full rounded bg-white shadow">
         <thead>
             <tr class="border-b text-left">
-                <th class="p-3">Nazwa</th>
+                <th class="p-3">Nazwa i adres</th>
                 <th class="p-3">Numer konta</th>
                 <th class="p-3"></th>
             </tr>
@@ -17,7 +17,7 @@
         <tbody>
             @forelse ($recipients as $recipient)
                 <tr class="border-b">
-                    <td class="p-3">{{ $recipient->name }}</td>
+                    <td class="p-3">{{ $recipient->name }}<br><span class="text-sm text-slate-500">{{ $recipient->address }}</span></td>
                     <td class="p-3 font-mono">{{ $recipient->formattedAccountNumber() }}</td>
                     <td class="flex justify-end gap-3 p-3">
                         <a href="{{ route('transfers.create', ['recipient' => $recipient->id]) }}" class="text-blue-600 hover:underline">Zrób przelew</a>
@@ -38,8 +38,12 @@
     <form method="POST" action="{{ route('recipients.store') }}" class="max-w-md space-y-4">
         @csrf
         <div>
-            <label for="name" class="block">Nazwa</label>
+            <label for="name" class="block">Nazwa odbiorcy</label>
             <input id="name" name="name" value="{{ old('name') }}" class="w-full rounded border p-2">
+        </div>
+        <div>
+            <label for="address" class="block">Adres odbiorcy</label>
+            <input id="address" name="address" value="{{ old('address') }}" class="w-full rounded border p-2">
         </div>
         <div>
             <label for="account_number" class="block">Numer konta</label>

@@ -26,7 +26,8 @@ class RecipientTest extends TestCase
     private function dodaj(array $zmiany = [])
     {
         return $this->post('/recipients', array_merge([
-            'name' => 'Mama',
+            'name' => 'Mama Kowalska',
+            'address' => 'ul. Polna 3, 00-950 Warszawa',
             'account_number' => $this->other->formattedAccountNumber(),
         ], $zmiany));
     }
@@ -37,16 +38,19 @@ class RecipientTest extends TestCase
 
         $this->assertDatabaseHas('recipients', [
             'user_id' => $this->user->id,
-            'name' => 'Mama',
+            'name' => 'Mama Kowalska',
+            'address' => 'ul. Polna 3, 00-950 Warszawa',
             'account_number' => $this->other->account_number,
         ]);
-        $this->get('/recipients')->assertOk()->assertSee('Mama')->assertSee($this->other->formattedAccountNumber());
+        $this->get('/recipients')->assertOk()->assertSee('Mama Kowalska')->assertSee('ul. Polna 3, 00-950 Warszawa')->assertSee($this->other->formattedAccountNumber());
     }
 
     public function test_walidacja_odbiorcy(): void
     {
         $this->dodaj(['name' => ''])->assertSessionHasErrors('name');
         $this->dodaj(['name' => '<b>'])->assertSessionHasErrors('name');
+        $this->dodaj(['address' => ''])->assertSessionHasErrors('address');
+        $this->dodaj(['address' => '<b>'])->assertSessionHasErrors('address');
         $this->dodaj(['account_number' => ''])->assertSessionHasErrors('account_number');
         $this->dodaj(['account_number' => '123'])->assertSessionHasErrors('account_number');
         $this->dodaj(['account_number' => '00000000000000000000000000'])->assertSessionHasErrors('account_number');
@@ -69,11 +73,13 @@ class RecipientTest extends TestCase
         $this->dodaj();
         $this->actingAs($this->other)->post('/recipients', [
             'name' => 'Kolega',
+            'address' => 'ul. Krótka 1, Gdańsk',
             'account_number' => $this->user->account_number,
         ])->assertSessionHasNoErrors();
         $trzeci = $this->createUser()->fresh();
         $this->actingAs($trzeci)->post('/recipients', [
             'name' => 'Ktos',
+            'address' => 'ul. Krótka 2, Gdańsk',
             'account_number' => $this->other->account_number,
         ])->assertSessionHasNoErrors();
 
@@ -83,7 +89,7 @@ class RecipientTest extends TestCase
     public function test_ksiazka_pokazuje_tylko_wlasnych_odbiorcow(): void
     {
         $this->dodaj();
-        $this->actingAs($this->other)->get('/recipients')->assertOk()->assertDontSee('Mama');
+        $this->actingAs($this->other)->get('/recipients')->assertOk()->assertDontSee('Mama Kowalska');
     }
 
     public function test_usuniecie_odbiorcy(): void
@@ -111,9 +117,11 @@ class RecipientTest extends TestCase
         $this->dodaj();
         $recipient = Recipient::first();
 
-        $this->get('/transfers/create')->assertSee('Mama');
+        $this->get('/transfers/create')->assertSee('Mama Kowalska');
         $this->get("/transfers/create?recipient={$recipient->id}")
-            ->assertSee('value="'.$this->other->formattedAccountNumber().'"', false);
+            ->assertSee('value="'.$this->other->formattedAccountNumber().'"', false)
+            ->assertSee('value="Mama Kowalska"', false)
+            ->assertSee('value="ul. Polna 3, 00-950 Warszawa"', false);
     }
 
     public function test_cudzy_odbiorca_nie_jest_podstawiany(): void
@@ -129,6 +137,8 @@ class RecipientTest extends TestCase
     {
         $this->post('/transfers', [
             'account_number' => $this->other->account_number,
+            'recipient_name' => 'Kolega z pracy',
+            'recipient_address' => 'ul. Krótka 1, Gdańsk',
             'amount' => '10',
             'title' => 'Za obiad',
             'save_recipient' => '1',
@@ -140,7 +150,8 @@ class RecipientTest extends TestCase
 
         $this->assertDatabaseHas('recipients', [
             'user_id' => $this->user->id,
-            'name' => $this->other->name,
+            'name' => 'Kolega z pracy',
+            'address' => 'ul. Krótka 1, Gdańsk',
             'account_number' => $this->other->account_number,
         ]);
     }
@@ -149,6 +160,8 @@ class RecipientTest extends TestCase
     {
         $this->post('/transfers', [
             'account_number' => $this->other->account_number,
+            'recipient_name' => 'Kolega z pracy',
+            'recipient_address' => 'ul. Krótka 1, Gdańsk',
             'amount' => '10',
             'title' => 'Za obiad',
         ]);
@@ -163,6 +176,8 @@ class RecipientTest extends TestCase
 
         $this->post('/transfers', [
             'account_number' => $this->other->account_number,
+            'recipient_name' => 'Kolega z pracy',
+            'recipient_address' => 'ul. Krótka 1, Gdańsk',
             'amount' => '10',
             'title' => 'Za obiad',
             'save_recipient' => '1',
