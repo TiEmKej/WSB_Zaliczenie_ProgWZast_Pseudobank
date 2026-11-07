@@ -24,8 +24,8 @@ Zasady:
 | 7. Historia przelewów | zrobiony |
 | 8. Aktywacja konta przez e-mail | zrobiony |
 | 9. Wyrażenia regularne | zrobiony |
-| 10. SQL Injection i zabezpieczenia | następny |
-| 11. Przygotowanie do oddania | do zrobienia |
+| 10. SQL Injection i zabezpieczenia | zrobiony |
+| 11. Przygotowanie do oddania | następny |
 
 Zmiany względem planu:
 
@@ -328,20 +328,20 @@ Commit: `Walidacja wyrażeniami regularnymi`
 
 Eloquent i Query Builder używają zapytań przygotowanych: wartość jest przekazywana osobno od treści SQL.
 
-- [ ] w kodzie nie ma `DB::raw`, `whereRaw` ani `DB::statement` z danymi użytkownika,
-- [ ] wyszukiwarka użytkowników w `index` panelu:
+- [x] w kodzie nie ma `DB::raw`, `whereRaw` ani `DB::statement` z danymi użytkownika,
+- [x] wyszukiwarka użytkowników w `index` panelu:
 
 ```php
 User::where('email', 'like', '%'.$request->query('q').'%')->paginate(20);
 ```
 
-- [ ] pokaz na obronie: wpisanie `' OR 1=1 --` w wyszukiwarkę i logowanie nic nie daje, a `DB::listen` lub log zapytań pokazuje `?` w SQL.
+- [x] pokaz na obronie: wpisanie `' OR 1=1 --` w wyszukiwarkę i logowanie nic nie daje, a `DB::listen` lub log zapytań pokazuje `?` w SQL.
 
 Testy `SqlInjectionTest`:
 
-- [ ] `' OR 1=1 --` w wyszukiwarce nie zwraca żadnego użytkownika,
-- [ ] `' OR 1=1 --` jako e-mail przy logowaniu nie loguje,
-- [ ] `'; DROP TABLE users; --` w wyszukiwarce nie usuwa tabeli.
+- [x] `' OR 1=1 --` w wyszukiwarce nie zwraca żadnego użytkownika,
+- [x] `' OR 1=1 --` jako e-mail przy logowaniu nie loguje,
+- [x] `'; DROP TABLE users; --` w wyszukiwarce nie usuwa tabeli.
 
 Pozostałe zabezpieczenia do omówienia:
 

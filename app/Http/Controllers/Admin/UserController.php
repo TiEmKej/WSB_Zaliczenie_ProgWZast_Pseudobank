@@ -22,9 +22,16 @@ class UserController extends Controller
         'role.in' => 'Wybrana rola jest nieprawidłowa.',
     ];
 
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.users.index', ['users' => User::orderBy('id')->paginate(20)]);
+        $search = (string) $request->query('q', '');
+
+        $users = User::where('email', 'like', '%'.$search.'%')
+            ->orderBy('id')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('admin.users.index', ['users' => $users, 'search' => $search]);
     }
 
     public function show(User $user)

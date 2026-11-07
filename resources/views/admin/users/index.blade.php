@@ -9,6 +9,11 @@
         <a href="{{ route('admin.users.create') }}" class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Dodaj użytkownika</a>
     </div>
 
+    <form method="GET" action="{{ route('admin.users.index') }}" class="mb-4 flex gap-2">
+        <input name="q" value="{{ $search }}" placeholder="Szukaj po adresie e-mail" class="w-full rounded border bg-white p-2">
+        <button class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Szukaj</button>
+    </form>
+
     <table class="w-full rounded bg-white shadow">
         <thead>
             <tr class="border-b text-left">
@@ -37,6 +42,9 @@
                     </td>
                 </tr>
             @endforeach
+            @if ($users->isEmpty())
+                <tr><td colspan="5" class="p-3 text-center text-slate-500">Brak użytkowników.</td></tr>
+            @endif
         </tbody>
     </table>
 
