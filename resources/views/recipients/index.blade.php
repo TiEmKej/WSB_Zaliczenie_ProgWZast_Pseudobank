@@ -4,51 +4,70 @@
 @section('width', 'max-w-3xl')
 
 @section('content')
-    <h1 class="mb-4 text-2xl font-semibold">Książka odbiorców</h1>
+    <h1 class="page-title mb-6">Książka odbiorców</h1>
 
-    <table class="mb-8 w-full rounded bg-white shadow">
-        <thead>
-            <tr class="border-b text-left">
-                <th class="p-3">Nazwa i adres</th>
-                <th class="p-3">Numer konta</th>
-                <th class="p-3"></th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($recipients as $recipient)
-                <tr class="border-b">
-                    <td class="p-3">{{ $recipient->name }}<br><span class="text-sm text-slate-500">{{ $recipient->address }}</span></td>
-                    <td class="p-3 font-mono">{{ $recipient->formattedAccountNumber() }}</td>
-                    <td class="flex justify-end gap-3 p-3">
-                        <a href="{{ route('transfers.create', ['recipient' => $recipient->id]) }}" class="text-blue-600 hover:underline">Zrób przelew</a>
-                        <form method="POST" action="{{ route('recipients.destroy', $recipient) }}" onsubmit="return confirm('Usunąć odbiorcę z książki?')">
-                            @csrf
-                            @method('DELETE')
-                            <button class="text-red-600 hover:underline">Usuń</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr><td colspan="3" class="p-3 text-center text-slate-500">Książka odbiorców jest pusta.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
+    @if ($recipients->isEmpty())
+        <div class="card mb-10 text-center">
+            <p class="font-semibold">Książka odbiorców jest pusta.</p>
+        </div>
+    @else
+        <div class="table-wrap mb-10">
+            <table class="hidden w-full sm:table">
+                <thead>
+                    <tr>
+                        <th class="th">Nazwa i adres</th>
+                        <th class="th">Numer konta</th>
+                        <th class="th"><span class="sr-only">Akcje</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($recipients as $recipient)
+                        <tr>
+                            <td class="td"><span class="font-semibold">{{ $recipient->name }}</span><br><span class="text-sm text-stone-600">{{ $recipient->address }}</span></td>
+                            <td class="td font-mono tracking-wide">{{ $recipient->formattedAccountNumber() }}</td>
+                            <td class="td">
+                                <div class="flex items-center justify-end gap-4">
+                                    <a href="{{ route('transfers.create', ['recipient' => $recipient->id]) }}" class="link-row">Zrób przelew</a>
+                                    <form method="POST" action="{{ route('recipients.destroy', $recipient) }}" onsubmit="return confirm('Usunąć odbiorcę z książki?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="link-danger">Usuń</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
 
-    <h2 class="mb-2 text-xl font-semibold">Dodaj odbiorcę</h2>
-    <form method="POST" action="{{ route('recipients.store') }}" class="max-w-md space-y-4">
+            <ul class="sm:hidden">
+                @foreach ($recipients as $recipient)
+                    <li class="mobile-row gap-1">
+                        <span class="font-semibold">{{ $recipient->name }}</span>
+                        <span class="text-sm text-stone-600">{{ $recipient->address }}</span>
+                        <span class="font-mono text-sm tracking-wide">{{ $recipient->formattedAccountNumber() }}</span>
+                        <div class="mt-2 flex items-center gap-3">
+                            <a href="{{ route('transfers.create', ['recipient' => $recipient->id]) }}" class="btn btn-secondary flex-1">Zrób przelew</a>
+                            <form method="POST" action="{{ route('recipients.destroy', $recipient) }}" onsubmit="return confirm('Usunąć odbiorcę z książki?')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="link-danger px-3">Usuń</button>
+                            </form>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <h2 class="mb-3 text-xl font-semibold">Dodaj odbiorcę</h2>
+    <form method="POST" action="{{ route('recipients.store') }}" class="card grid gap-5 sm:grid-cols-2">
         @csrf
-        <div>
-            <label for="name" class="block">Nazwa odbiorcy</label>
-            <input id="name" name="name" value="{{ old('name') }}" class="w-full rounded border p-2">
+        <x-field name="name" label="Nazwa odbiorcy" :value="old('name')" />
+        <x-field name="address" label="Adres odbiorcy" :value="old('address')" />
+        <div class="sm:col-span-2">
+            <x-field name="account_number" label="Numer konta" mono :value="App\Support\AccountNumber::format(old('account_number'))" />
         </div>
-        <div>
-            <label for="address" class="block">Adres odbiorcy</label>
-            <input id="address" name="address" value="{{ old('address') }}" class="w-full rounded border p-2">
-        </div>
-        <div>
-            <label for="account_number" class="block">Numer konta</label>
-            <input id="account_number" name="account_number" value="{{ App\Support\AccountNumber::format(old('account_number')) }}" class="w-full rounded border p-2 font-mono">
-        </div>
-        <button class="w-full rounded bg-blue-600 p-2 text-white hover:bg-blue-700">Zapisz odbiorcę</button>
+        <button class="btn btn-primary btn-block sm:col-span-2 sm:w-auto sm:self-start">Zapisz odbiorcę</button>
     </form>
 @endsection

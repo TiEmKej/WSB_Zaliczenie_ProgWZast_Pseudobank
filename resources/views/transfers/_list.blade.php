@@ -1,37 +1,75 @@
-<table class="w-full rounded bg-white shadow">
-    <thead>
-        <tr class="border-b text-left">
-            <th class="p-3">Data</th>
-            <th class="p-3">Druga strona</th>
-            <th class="p-3">Tytuł</th>
-            <th class="p-3 text-right">Kwota</th>
-            <th class="p-3"></th>
-        </tr>
-    </thead>
-    <tbody>
-        @forelse ($transfers as $transfer)
-            @php
-                $outgoing = $transfer->sender_id === $user->id;
-                $other = $outgoing ? $transfer->recipient : $transfer->sender;
-            @endphp
-            <tr class="border-b">
-                <td class="p-3">{{ $transfer->created_at->format('d.m.Y H:i') }}</td>
-                <td class="p-3">{{ $other?->name ?? 'konto usunięte' }}</td>
-                <td class="p-3">{{ $transfer->title }}</td>
-                <td class="p-3 text-right {{ $outgoing ? 'text-red-600' : 'text-green-600' }}">
-                    {{ $outgoing ? '−' : '+' }}{{ number_format($transfer->amount, 2, ',', ' ') }} zł
-                </td>
-                <td class="p-3 text-right">
-                    @if ($outgoing && $other)
-                        <form method="POST" action="{{ route('transfers.repeat', $transfer) }}">
-                            @csrf
-                            <button class="text-blue-600 hover:underline">Powtórz</button>
-                        </form>
-                    @endif
-                </td>
-            </tr>
-        @empty
-            <tr><td colspan="5" class="p-3 text-center text-slate-500">Brak przelewów.</td></tr>
-        @endforelse
-    </tbody>
-</table>
+@php
+    $rows = $transfers->map(function ($transfer) use ($user) {
+        $outgoing = $transfer->sender_id === $user->id;
+        $other = $outgoing ? $transfer->recipient : $transfer->sender;
+
+        return (object) [
+            'transfer' => $transfer,
+            'outgoing' => $outgoing,
+            'other' => $other,
+            'name' => $other?->name ?? 'konto usunięte',
+            'amount' => ($outgoing ? '−' : '+').number_format($transfer->amount, 2, ',', ' ').' zł',
+        ];
+    });
+@endphp
+
+@if ($rows->isEmpty())
+    <div class="card flex flex-col items-center gap-2 text-center">
+        <p class="font-semibold">Brak przelewów.</p>
+        <p class="text-sm text-stone-600">Gdy wykonasz pierwszy przelew, zobaczysz go tutaj.</p>
+        <a href="{{ route('transfers.create') }}" class="btn btn-primary mt-3">Nowy przelew</a>
+    </div>
+@else
+    <div class="table-wrap">
+        <table class="hidden w-full sm:table">
+            <thead>
+                <tr>
+                    <th class="th">Data</th>
+                    <th class="th">Druga strona</th>
+                    <th class="th">Tytuł</th>
+                    <th class="th text-right">Kwota</th>
+                    <th class="th"><span class="sr-only">Akcje</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($rows as $row)
+                    <tr>
+                        <td class="td whitespace-nowrap tabular-nums text-stone-600">{{ $row->transfer->created_at->format('d.m.Y H:i') }}</td>
+                        <td class="td font-medium">{{ $row->name }}</td>
+                        <td class="td">{{ $row->transfer->title }}</td>
+                        <td class="td whitespace-nowrap text-right font-semibold tabular-nums {{ $row->outgoing ? 'text-red-700' : 'text-emerald-700' }}">{{ $row->amount }}</td>
+                        <td class="td text-right">
+                            @if ($row->outgoing && $row->other)
+                                <form method="POST" action="{{ route('transfers.repeat', $row->transfer) }}">
+                                    @csrf
+                                    <button class="link-row">Powtórz</button>
+                                </form>
+                            @endif
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <ul class="sm:hidden">
+            @foreach ($rows as $row)
+                <li class="mobile-row">
+                    <div class="flex items-baseline justify-between gap-3">
+                        <span class="font-semibold">{{ $row->name }}</span>
+                        <span class="whitespace-nowrap font-semibold tabular-nums {{ $row->outgoing ? 'text-red-700' : 'text-emerald-700' }}">{{ $row->amount }}</span>
+                    </div>
+                    <p>{{ $row->transfer->title }}</p>
+                    <div class="flex items-center justify-between gap-3">
+                        <span class="text-sm tabular-nums text-stone-600">{{ $row->transfer->created_at->format('d.m.Y H:i') }}</span>
+                        @if ($row->outgoing && $row->other)
+                            <form method="POST" action="{{ route('transfers.repeat', $row->transfer) }}">
+                                @csrf
+                                <button class="link-row">Powtórz</button>
+                            </form>
+                        @endif
+                    </div>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+@endif

@@ -1,26 +1,7 @@
 @csrf
-<div>
-    <label for="name" class="block">Imię i nazwisko</label>
-    <input id="name" name="name" value="{{ old('name', $user->name) }}" class="w-full rounded border p-2">
-</div>
-<div>
-    <label for="email" class="block">E-mail</label>
-    <input id="email" name="email" value="{{ old('email', $user->email) }}" class="w-full rounded border p-2">
-</div>
+<x-field name="name" label="Imię i nazwisko" :value="old('name', $user->name)" />
+<x-field name="email" label="E-mail" :value="old('email', $user->email)" />
 @include('partials.pesel-fields')
-<div>
-    <label for="password" class="block">Hasło</label>
-    <input id="password" type="password" name="password" class="w-full rounded border p-2">
-    @if ($user->exists)
-        <p class="text-sm text-slate-500">Zostaw puste, aby nie zmieniać hasła.</p>
-    @endif
-</div>
-<div>
-    <label for="role" class="block">Rola</label>
-    <select id="role" name="role" class="w-full rounded border p-2">
-        @foreach (['user' => 'klient', 'admin' => 'administrator'] as $role => $label)
-            <option value="{{ $role }}" @selected(old('role', $user->role ?? 'user') === $role)>{{ $label }}</option>
-        @endforeach
-    </select>
-</div>
-<button class="w-full rounded bg-blue-600 p-2 text-white hover:bg-blue-700">Zapisz</button>
+<x-field name="password" label="Hasło" type="password" :hint="$user->exists ? 'Zostaw puste, aby nie zmieniać hasła.' : null" />
+<x-select name="role" label="Rola" :options="['user' => 'klient', 'admin' => 'administrator']" :selected="old('role', $user->role ?? 'user')" />
+<button class="btn btn-primary btn-block sm:col-span-2">Zapisz</button>

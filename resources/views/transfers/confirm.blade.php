@@ -1,26 +1,29 @@
 @extends('layouts.app')
 
 @section('title', 'Potwierdzenie przelewu')
+@section('width', 'max-w-2xl')
 
 @section('content')
-    <h1 class="mb-4 text-2xl font-semibold">Potwierdź przelew</h1>
+    <x-stepper :current="2" />
+
+    <h1 class="page-title mb-6">Potwierdź przelew</h1>
 
     @include('transfers._source')
 
-    <dl class="space-y-2 rounded bg-white p-6 shadow">
-        <div><dt class="text-sm text-slate-500">Numer konta odbiorcy</dt><dd class="font-mono">{{ App\Support\AccountNumber::format($pending['account_number']) }}</dd></div>
-        <div><dt class="text-sm text-slate-500">Nazwa odbiorcy</dt><dd>{{ $pending['recipient_name'] }}</dd></div>
-        <div><dt class="text-sm text-slate-500">Adres odbiorcy</dt><dd>{{ $pending['recipient_address'] }}</dd></div>
-        <div><dt class="text-sm text-slate-500">Kwota</dt><dd>{{ number_format($pending['amount'], 2, ',', ' ') }} zł</dd></div>
-        <div><dt class="text-sm text-slate-500">Tytuł</dt><dd>{{ $pending['title'] }}</dd></div>
-        <div><dt class="text-sm text-slate-500">Saldo po przelewie</dt><dd>{{ number_format($user->balance - $pending['amount'], 2, ',', ' ') }} zł</dd></div>
+    <dl class="data-list">
+        <div class="data-row"><dt>Numer konta odbiorcy</dt><dd class="font-mono tracking-wide">{{ App\Support\AccountNumber::format($pending['account_number']) }}</dd></div>
+        <div class="data-row"><dt>Nazwa odbiorcy</dt><dd>{{ $pending['recipient_name'] }}</dd></div>
+        <div class="data-row"><dt>Adres odbiorcy</dt><dd>{{ $pending['recipient_address'] }}</dd></div>
+        <div class="data-row"><dt>Kwota</dt><dd class="text-xl font-semibold tabular-nums">{{ number_format($pending['amount'], 2, ',', ' ') }} zł</dd></div>
+        <div class="data-row"><dt>Tytuł</dt><dd>{{ $pending['title'] }}</dd></div>
+        <div class="data-row"><dt>Saldo po przelewie</dt><dd class="font-semibold tabular-nums">{{ number_format($user->balance - $pending['amount'], 2, ',', ' ') }} zł</dd></div>
     </dl>
 
-    <div class="mt-4 flex items-center gap-4">
-        <form method="POST" action="{{ route('transfers.execute') }}">
+    <div class="mt-6 flex flex-col gap-3 sm:flex-row-reverse sm:justify-start">
+        <form method="POST" action="{{ route('transfers.execute') }}" class="sm:w-auto">
             @csrf
-            <button class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Potwierdź</button>
+            <button class="btn btn-primary btn-block sm:w-auto">Potwierdź</button>
         </form>
-        <a href="{{ route('transfers.create') }}" class="text-blue-600 hover:underline">Popraw</a>
+        <a href="{{ route('transfers.create') }}" class="btn btn-secondary btn-block sm:w-auto">Popraw</a>
     </div>
 @endsection

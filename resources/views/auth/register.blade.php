@@ -1,28 +1,21 @@
 @extends('layouts.app')
 
 @section('title', 'Rejestracja')
+@section('width', 'max-w-xl')
 
 @section('content')
-    <h1 class="mb-4 text-2xl font-semibold">Rejestracja</h1>
-    <form method="POST" action="{{ route('register') }}" class="space-y-4">
+    <h1 class="page-title">Rejestracja</h1>
+    <p class="mb-6 mt-2 text-stone-600">Założysz konto z saldem startowym 1 000,00 zł. Link aktywacyjny wyślemy na Twój e-mail.</p>
+
+    <form method="POST" action="{{ route('register') }}" class="card grid gap-5 sm:grid-cols-2">
         @csrf
-        <div>
-            <label for="name" class="block">Imię i nazwisko</label>
-            <input id="name" name="name" value="{{ old('name') }}" class="w-full rounded border p-2">
-        </div>
-        <div>
-            <label for="email" class="block">E-mail</label>
-            <input id="email" name="email" value="{{ old('email') }}" class="w-full rounded border p-2">
-        </div>
+        <x-field name="name" label="Imię i nazwisko" :value="old('name')" />
+        <x-field name="email" label="E-mail" :value="old('email')" />
         @include('partials.pesel-fields', ['user' => new App\Models\User])
-        <div>
-            <label for="password" class="block">Hasło</label>
-            <input id="password" type="password" name="password" class="w-full rounded border p-2">
-        </div>
-        <div>
-            <label for="password_confirmation" class="block">Powtórz hasło</label>
-            <input id="password_confirmation" type="password" name="password_confirmation" class="w-full rounded border p-2">
-        </div>
-        <button class="w-full rounded bg-blue-600 p-2 text-white hover:bg-blue-700">Zarejestruj się</button>
+        <x-field name="password" label="Hasło" type="password" />
+        <x-field name="password_confirmation" label="Powtórz hasło" type="password" />
+        <button class="btn btn-primary btn-block sm:col-span-2">Zarejestruj się</button>
     </form>
+
+    <p class="mt-6 text-center text-stone-600">Masz już konto? <a href="{{ route('login') }}" class="link">Zaloguj się</a></p>
 @endsection

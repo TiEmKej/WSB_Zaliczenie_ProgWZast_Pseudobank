@@ -3,17 +3,15 @@
 @section('title', 'Logowanie')
 
 @section('content')
-    <h1 class="mb-4 text-2xl font-semibold">Logowanie</h1>
-    <form method="POST" action="{{ route('login') }}" class="space-y-4">
+    <h1 class="page-title">Logowanie</h1>
+    <p class="mb-6 mt-2 text-stone-600">Zaloguj się, aby zobaczyć swoje konto i wykonać przelew.</p>
+
+    <form method="POST" action="{{ route('login') }}" class="card space-y-5">
         @csrf
-        <div>
-            <label for="email" class="block">E-mail</label>
-            <input id="email" name="email" value="{{ old('email') }}" class="w-full rounded border p-2">
-        </div>
-        <div>
-            <label for="password" class="block">Hasło</label>
-            <input id="password" type="password" name="password" class="w-full rounded border p-2">
-        </div>
-        <button class="w-full rounded bg-blue-600 p-2 text-white hover:bg-blue-700">Zaloguj się</button>
+        <x-field name="email" label="E-mail" :value="old('email')" />
+        <x-field name="password" label="Hasło" type="password" />
+        <button class="btn btn-primary btn-block">Zaloguj się</button>
     </form>
+
+    <p class="mt-6 text-center text-stone-600">Nie masz jeszcze konta? <a href="{{ route('register') }}" class="link">Zarejestruj się</a></p>
 @endsection
