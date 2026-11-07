@@ -93,3 +93,34 @@ DB::transaction(function () {
 | Nadanie sobie uprawnień | `role` i `balance` poza `#[Fillable]` |
 | Wyciek hasła | bcrypt, `#[Hidden]` |
 | Dostęp bez uprawnień | middleware `auth`, `verified`, `admin`, `client` na trasach |
+
+## 9. PESEL
+
+Kod: [Pesel.php](app/Support/Pesel.php), reguła [ValidPesel.php](app/Rules/ValidPesel.php), użycie w [AuthController.php](app/Http/Controllers/AuthController.php) i [UserController.php](app/Http/Controllers/Admin/UserController.php).
+
+Budowa numeru `RRMMDDPPPQK`:
+
+- `RR`, `MM`, `DD`: rok, miesiąc i dzień urodzenia. Wiek jest zakodowany w miesiącu: 1800–1899 dodaje 80, 1900–1999 nic, 2000–2099 dodaje 20, 2100–2199 dodaje 40, 2200–2299 dodaje 60. Dlatego `05230912345` to 9 marca 2005, a nie 1905.
+- `PPP`: numer porządkowy, `Q`: cyfra płci (nieparzysta to mężczyzna, parzysta to kobieta), `K`: cyfra kontrolna.
+
+Suma kontrolna: cyfry 1–10 mnożymy przez wagi `1 3 7 9 1 3 7 9 1 3` i sumujemy. Cyfra kontrolna to `(10 − suma mod 10) mod 10`. Przykład dla `44051401359`: suma = 101, więc `(10 − 1) mod 10 = 9` i numer jest poprawny. Suma kontrolna wyłapuje pomyłkę w jednej cyfrze i większość zamian sąsiednich.
+
+Co sprawdza walidacja przy rejestracji:
+
+1. `regex:/^\d{11}$/`: dokładnie 11 cyfr (reguła `bail` przerywa dalsze sprawdzanie, gdy to nie przejdzie).
+2. `unique:users`: numer nie jest już zarejestrowany.
+3. `ValidPesel`: suma kontrolna, istniejąca data urodzenia (`checkdate`, nie z przyszłości) i zgodność płci z polem „Płeć” z formularza.
+
+Płeć z formularza nie jest zapisywana, bo wynika z PESEL (`gender()` w modelu). Data urodzenia i płeć w profilu też są z niego odczytywane.
+
+Generator („Generuj poprawny PESEL”): losuje datę, koduje miesiąc dla wieku, dobiera cyfrę płci i liczy cyfrę kontrolną tym samym kodem co walidacja. Przycisk i trasa `/dev/pesel` ([DevController.php](app/Http/Controllers/DevController.php)) istnieją tylko poza środowiskiem `production`.
+
+## 10. Książka odbiorców i powtórzenie przelewu
+
+- Tabela `recipients` (`user_id`, `name`, `account_number`) ma klucz obcy `user_id` z `cascadeOnDelete()`, więc odbiorcy znikają razem z właścicielem, oraz unikalność pary `(user_id, account_number)`. Dwie osoby mogą zapisać to samo konto, ale jedna nie może zapisać go dwa razy.
+- Przy usuwaniu sprawdzam, czy odbiorca należy do zalogowanego (`abort_unless(..., 403)`), bo samo `{recipient}` w adresie można podmienić. To samo przy powtarzaniu przelewu: tylko nadawca może go powtórzyć.
+- Powtórzenie to `POST /transfers/{transfer}/repeat`. Dane przelewu trafiają przez te same reguły walidacji i sprawdzenie salda co zwykły przelew, a potem do sesji i na ekran potwierdzenia. Nic nie jest wykonywane bez drugiego kliknięcia.
+
+## 11. Format numeru konta
+
+[AccountNumber.php](app/Support/AccountNumber.php): `format()` robi `29 5234 6767 1873 3454 8751 4799` (dwie cyfry, potem grupy po cztery), a `normalize()` usuwa spacje z wpisanego numeru przed walidacją. W bazie numer jest zawsze zapisany bez spacji (`char(26)`), formatowanie dotyczy tylko wyświetlania.
